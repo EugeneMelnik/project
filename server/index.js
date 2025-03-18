@@ -1,267 +1,59 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const path = require('path');
-const socketIo = require('socket.io');
-const http = require('http');
-const routerCollection = require('./endpoints/collection');
-const routerItem = require('./endpoints/item');
-const routerUser = require('./endpoints/user');
-const routerTheme = require('./endpoints/themes');
-const routerTag = require('./endpoints/tag');
-const routerFilters = require('./endpoints/filters');
-const connection = require('./services/mySQL');
-const models = require('./services/sequelize');
-const Roles = require('../seeders/utils/Roles');
+import db from './db/models/index.js';
+import express from 'express';
+import cors from 'cors';
+import http from 'http';
+import controllers from './controllers/index.js';
+import legacyRouter from './controllers/legacy/index.js';
+import bodyParser from 'body-parser';
+import './firebase/config.js';
 
-const port = process.env.PORT || 5000;
+const l = await db;
+
+const port = process.env.API_PORT || 5000;
 
 const app = express();
 
-const server = http.createServer(app);
+async function normalizeTagsPrimaryKey() {
+  const [tables] = await l.sequelize.query("SHOW TABLES LIKE 'tags'");
 
-const io = socketIo(server, {
-  cors: {
+  if (tables.length === 0) return;
+
+  const [keys] = await l.sequelize.query('SHOW KEYS FROM `tags`');
+  const primaryKeyColumns = keys
+    .filter((key) => key.Key_name === 'PRIMARY')
+    .map((key) => key.Column_name);
+
+  if (primaryKeyColumns.length > 1 && primaryKeyColumns.includes('content')) {
+    await l.sequelize.query(
+      'ALTER TABLE `tags` DROP PRIMARY KEY, ADD PRIMARY KEY (`id`)'
+    );
+  }
+}
+
+app.use(
+  cors({
     origin: process.env.BASE_URL,
-  },
-});
+    credentials: true,
+  })
+);
 
-io.on('connection', (socket) => {
-  socket.join('update');
-});
-
-app.use(cors());
-
-app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-connection.connect((err) => {
-  if (err) {
-    console.log('Error occurred', err);
-  }
-});
+app.use('/api', legacyRouter);
+app.use('/api/user', controllers.userRouter);
 
-models.sequelize.sync().catch((err) => console.log(err));
+const server = http.createServer(app);
 
-app.use(routerUser);
-app.use(routerCollection);
-app.use(routerItem);
-app.use(routerTag);
-app.use(routerFilters);
-app.use(routerTheme);
-
-// comments with socket
-
-const router = express.Router();
-
-router.get('/api/getAllComments/', (req, res) => {
-  const { itemId } = req.query;
-
-  models.Comment.findAll({
-    attributes: ['content', 'createdAt', 'status'],
-    where: {
-      itemId,
-    },
-    include: [
-      {
-        model: models.User,
-        attributes: ['name', 'surname', 'id'],
-      },
-    ],
+l.sequelize
+  .authenticate()
+  .then(normalizeTagsPrimaryKey)
+  .then(() => l.sequelize.sync({ force: false }))
+  .then(function () {
+    server.listen(port, function () {
+      console.log('server is successfully running on port ' + port);
+    });
   })
-    .then((result) => res.status(200).send(result))
-    .catch((err) => res.status(400).send({
-      code: 0,
-      message: err,
-    }));
-});
-
-router.get('/api/getAllUntouchedComments/', (req, res) => {
-  const { userId } = req.query;
-
-  models.Collection.findAll({
-    where: {
-      userId,
-    },
-    include: [
-      {
-        model: models.Item,
-        include: [
-          {
-            model: models.Comment,
-            attributes: ['content', 'createdAt'],
-            where: {
-              status: 'untouched',
-            },
-            include: [
-              {
-                model: models.User,
-                attributes: ['name', 'surname'],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  })
-    .then((result) => {
-      const untoucnhedComments = [];
-      result.forEach((collection) => {
-        let icon = '';
-        collection.items.forEach((item) => {
-          if (item.icon) {
-            icon = Buffer.from(item.icon).toString('base64');
-          }
-
-          untoucnhedComments.push({
-            icon,
-            title: item.title,
-            collectionId: item.collectionId,
-            comments: item.comments,
-            itemId: item.id,
-          });
-        });
-      });
-      res.status(200).send(untoucnhedComments);
-    })
-    .catch((err) => res.status(400).send({
-      code: 0,
-      message: err,
-    }));
-});
-
-router.put('/api/setCommentsTouched/', (req, res) => {
-  const { itemId } = req.body;
-
-  models.Comment.update({ status: 'touched' }, { where: { itemId } })
-    .then((result) => res.status(200).send(result))
-    .catch((err) => res.status(400).send({
-      code: 0,
-      message: err,
-    }));
-});
-
-router.post('/api/addComment/', (req, res) => {
-  const { content, userId, itemId } = req.body;
-
-  models.Comment.create({
-    content,
-    userId,
-    itemId,
-  })
-    .then((result) => {
-      if (result) {
-        models.Item.findOne({
-          where: {
-            id: result.itemId,
-          },
-        })
-          .then((item) => item.getCollection())
-          .then((collection) => {
-            io.to('update').emit('comment', {
-              userId: collection.userId,
-              itemId,
-            });
-            return res.status(200).send('The message was sent!');
-          });
-      }
-    })
-    .catch((err) => res.status(400).send({
-      code: 0,
-      message: err,
-    }));
-});
-
-router.post('/api/blockUser', (req, res) => {
-  const { id } = req.body;
-
-  models.User.update({ status: 'blocked' }, { where: { id } })
-    .then(() => {
-      io.to('update').emit('block', {
-        userId: id,
-      });
-
-      return res.status(200).send({
-        code: 1,
-        message: 'Blocked success!',
-      });
-    })
-    .catch((err) => res.status(400).send({
-      code: 0,
-      message: err,
-    }));
-});
-
-router.post('/api/unblockUser', (req, res) => {
-  const { id } = req.body;
-
-  models.User.update({ status: 'active' }, { where: { id } })
-    .then(() => {
-      io.to('update').emit('unblock', {
-        userId: id,
-      });
-
-      return res.status(200).send({
-        code: 1,
-        message: 'Unblocked success!',
-      });
-    })
-    .catch((err) => res.status(400).send({
-      code: 0,
-      message: err,
-    }));
-});
-
-router.post('/api/setIsAdmin', (req, res) => {
-  const { id } = req.body;
-
-  models.User.update({ role: Roles.Admin }, { where: { id } })
-    .then(() => {
-      io.to('update').emit('isAdmin', {
-        userId: id,
-      });
-
-      return res.status(200).send({
-        code: 1,
-        message: 'Set isAdmin success!',
-      });
-    })
-    .catch((err) => res.status(400).send({
-      code: 0,
-      message: err,
-    }));
-});
-
-router.post('/api/setIsNotAdmin', (req, res) => {
-  const { id } = req.body;
-
-  models.User.update({ role: Roles.User }, { where: { id } })
-    .then(() => {
-      io.to('update').emit('isNotAdmin', {
-        userId: id,
-      });
-
-      return res.status(200).send({
-        code: 1,
-        message: 'Set isNotAdmin success!',
-      });
-    })
-    .catch((err) => res.status(400).send({
-      code: 0,
-      message: err,
-    }));
-});
-
-app.use(router);
-
-app.use(express.static(`${__dirname}./../build`));
-app.use(express.static(`${__dirname}./../build/static/js`));
-app.use(express.static(`${__dirname}./../build/static/css`));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, './../build/index.html'));
-});
-
-server.listen(port, () => {
-  console.log(`running on port ${port}`);
-});
+  .catch(function (error) {
+    console.error('server failed to start', error);
+    process.exitCode = 1;
+  });

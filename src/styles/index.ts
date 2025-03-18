@@ -1,4 +1,4 @@
-import createBreakpoints from '@material-ui/core/styles/createBreakpoints';
+import { createBreakpoints } from '@mui/system';
 
 export const Colors = {
   primary_dark: '#1f2a2f',

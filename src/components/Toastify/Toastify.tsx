@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify';
 
-const Toastify: FC<any> = () => (
+const Toastify: FC = () => (
   <ToastContainer
     position="top-right"
     autoClose={2000}

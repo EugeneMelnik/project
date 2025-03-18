@@ -1,4 +1,46 @@
-# Getting Started with Create React App
+# My App
+
+## Local development
+
+Requirements: Node.js, Docker and Docker Compose.
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Start the local MySQL container:
+
+   ```bash
+   npm run db:up
+   ```
+
+3. Start the API in one terminal:
+
+   ```bash
+   npm run server:dev
+   ```
+
+4. Start the frontend in another terminal:
+
+   ```bash
+   npm start
+   ```
+
+The frontend is available at `http://localhost:3000`, the API at
+`http://localhost:5050`, and MySQL at `127.0.0.1:3307`.
+
+Firebase authentication requires the project values in `.env`. They are not
+included in the repository and cannot be generated locally.
+
+Stop the database with:
+
+```bash
+npm run db:down
+```
+
+## Create React App reference
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

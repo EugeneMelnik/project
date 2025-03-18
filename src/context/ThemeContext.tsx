@@ -168,11 +168,11 @@ export const themes = {
   dark: themeDark,
 };
 
-type ThemeType = 'light' | 'dark';
+export type ThemeType = 'light' | 'dark';
 
 interface ITheme {
   theme: ThemeType;
-  setTheme:(theme: ThemeType) => void;
+  setTheme: (theme: ThemeType) => void;
 }
 
 function setThemeValue(theme: ThemeType) {
@@ -188,7 +188,7 @@ const ThemeContext = createContext<ITheme | null>(null);
 export const ThemeContextProvider: FC<{ children: ReactElement }> = ({
   children,
 }) => {
-  const [theme, setTheme] = useState<ThemeType>('light');
+  const [theme, setTheme] = useState<ThemeType>(getTheme() || 'light');
 
   const handleSetTheme = (theme: ThemeType) => {
     setTheme(theme);
@@ -200,7 +200,10 @@ export const ThemeContextProvider: FC<{ children: ReactElement }> = ({
     handleSetTheme('light');
   }
 
-  const themeProviderValue = useMemo(() => ({ theme, setTheme: handleSetTheme }), [theme]);
+  const themeProviderValue = useMemo(
+    () => ({ theme, setTheme: handleSetTheme }),
+    [theme]
+  );
 
   return (
     <ThemeContext.Provider value={themeProviderValue}>

@@ -1,60 +1,32 @@
 import React, { FC, useEffect } from 'react';
-import { connect } from 'react-redux';
 import 'firebase/compat/auth';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import {
-  Backdrop, CircularProgress, ThemeProvider, CssBaseline,
+  Backdrop,
+  CircularProgress,
+  ThemeProvider,
+  CssBaseline,
 } from '@mui/material';
-import {
-  CredentialsType,
-  getUserPersonalInfoThunk,
-  toggleLikeThunk,
-} from './redux/actions/user-action';
-import { AppStateType } from './redux';
-import { setIsAuthAction } from './redux/actions/auth-action';
 import Toastify from './components/Toastify/Toastify';
-import AppRoutes from './routes';
+import { AppRoutes } from './routes';
 import { useTheme, themes } from './context/ThemeContext';
+import { isLoadingSelector } from './redux/selectors/share-selector';
+import { useTypedSelector } from './redux';
+import { restoreAuthThunk } from './redux/actions/user-action';
+import { useTypedDispatch } from './redux';
 
-interface IRootPage {
-  getUserPersonalInfo: (payload: CredentialsType) => void;
-  toggleLike: (userId: number, itemId: number) => void;
-  isAuth: boolean;
-  setIsAuth: (isAuth: boolean) => void;
-}
-const App: FC<IRootPage> = ({
-  getUserPersonalInfo,
-  toggleLike,
-  isAuth,
-  setIsAuth,
-}) => {
+const App: FC = () => {
   const { theme } = useTheme();
+  const dispatch = useTypedDispatch();
+
+  const isLoading = useTypedSelector(isLoadingSelector);
 
   useEffect(() => {
-    const auth = getAuth();
+    dispatch(restoreAuthThunk());
+  }, [dispatch]);
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const { uid, displayName, email } = user;
-        if (displayName && email) {
-          const [name, surname] = displayName.split(' ');
-
-          getUserPersonalInfo({
-            id: uid,
-            name,
-            surname,
-            email,
-          });
-        }
-      } else {
-        setIsAuth(true);
-      }
-    });
-  }, []);
-
-  if (!isAuth) {
+  if (isLoading) {
     return (
-      <Backdrop open={!isAuth}>
+      <Backdrop open={isLoading}>
         <CircularProgress color="warning" />
       </Backdrop>
     );
@@ -64,20 +36,11 @@ const App: FC<IRootPage> = ({
     <ThemeProvider theme={themes[theme]}>
       <CssBaseline />
       <div className="App">
-        <AppRoutes toggleLike={toggleLike} />
+        <AppRoutes />
         <Toastify />
       </div>
     </ThemeProvider>
   );
 };
-const mapStateToProps = (state: AppStateType) => ({
-  isAuth: state.auth.isAuth,
-});
 
-const mapDispatchToProps = (dispatch: any) => ({
-  getUserPersonalInfo: (payload: CredentialsType) => dispatch(getUserPersonalInfoThunk(payload)),
-  toggleLike: (userId: number, itemId: number) => dispatch(toggleLikeThunk(userId, itemId)),
-  setIsAuth: (isAuth: boolean) => dispatch(setIsAuthAction(isAuth)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default App;
