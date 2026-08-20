@@ -2,6 +2,7 @@ import db from './db/models/index.js';
 import express from 'express';
 import cors from 'cors';
 import http from 'http';
+import { Server as SocketServer } from 'socket.io';
 import controllers from './controllers/index.js';
 import legacyRouter from './controllers/legacy/index.js';
 import bodyParser from 'body-parser';
@@ -43,6 +44,16 @@ app.use('/api', legacyRouter);
 app.use('/api/user', controllers.userRouter);
 
 const server = http.createServer(app);
+const io = new SocketServer(server, {
+  cors: {
+    origin: process.env.BASE_URL,
+    credentials: true,
+  },
+});
+
+io.on('connection', (socket) => {
+  socket.join('update');
+});
 
 l.sequelize
   .authenticate()

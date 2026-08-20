@@ -1,22 +1,17 @@
 import React, { FC, useState } from 'react';
-import { makeStyles } from '@mui/styles';
-import { Theme } from '@mui/material/styles';
+import { Box } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import CollectionsIcon from '@mui/icons-material/Collections';
 import LogoutIcon from '@mui/icons-material/Logout';
 import HomeIcon from '@mui/icons-material/Home';
 import { Link as RouterLink } from 'react-router-dom';
-import { Box, Button, Drawer, Link } from '@mui/material';
+import { Button, Drawer, Link } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import RoutesApp from '../../constants/routes';
-import { useTypedDispatch, useTypedSelector } from '../../redux';
-import { logOutThunk } from '../../redux/actions/user-action';
-import {
-  userIdSelector,
-  userRoleSelector,
-} from '../../redux/selectors/user-selector';
+import logout from '../../auth/services/logout';
+import { logError } from '../../services/logger';
 
 const ToggleButton = styled(Button)(({ theme }) => ({
   position: 'fixed',
@@ -38,7 +33,7 @@ const LinkButton = styled(Button)({
   minHeight: '4.4rem',
 });
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles((theme) => ({
   drawer: {
     zIndex: theme.zIndex.appBar - 1,
   },
@@ -47,13 +42,14 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-const ToolBar: FC = () => {
+interface IToolBar {
+  id: string;
+  logOutUser: (id: string) => void;
+  role: 'Admin' | 'User' | 'Reader' | null;
+}
+
+const ToolBar: FC<IToolBar> = ({ logOutUser, id, role }) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
-
-  const dispatch = useTypedDispatch();
-
-  const userId = useTypedSelector(userIdSelector);
-  const role = useTypedSelector(userRoleSelector);
 
   const classes = useStyles();
 
@@ -62,7 +58,13 @@ const ToolBar: FC = () => {
   }
 
   async function handleLogout() {
-    if (userId) await dispatch(logOutThunk(userId));
+    try {
+      await logout();
+
+      logOutUser(id);
+    } catch (error: any) {
+      logError(error.message);
+    }
   }
 
   return (
@@ -84,7 +86,7 @@ const ToolBar: FC = () => {
           </LinkButton>
         </Link>
         {role && role !== 'Reader' && (
-          <Link component={RouterLink} to={RoutesApp.Profile}>
+          <Link component={RouterLink} to={RoutesApp.User}>
             <LinkButton>
               <PersonIcon fontSize="large" />
             </LinkButton>
@@ -95,13 +97,6 @@ const ToolBar: FC = () => {
             <CollectionsIcon fontSize="large" />
           </LinkButton>
         </Link>
-        {role === 'Admin' && (
-          <Link component={RouterLink} to={RoutesApp.Admin}>
-            <LinkButton aria-label="Administration">
-              <AdminPanelSettingsIcon fontSize="large" />
-            </LinkButton>
-          </Link>
-        )}
         {role && role !== 'Reader' && (
           <Link component={RouterLink} to={RoutesApp.Login}>
             <LinkButton onClick={handleLogout}>

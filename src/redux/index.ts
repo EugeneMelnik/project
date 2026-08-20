@@ -1,21 +1,34 @@
 import { configureStore } from '@reduxjs/toolkit';
-import thunkMiddleware, { ThunkDispatch } from 'redux-thunk';
-import { AnyAction } from 'redux';
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import { rootReducer } from './reducers/root-reducer';
+import thunkMiddleware from 'redux-thunk';
+import adminReducer from './reducers/admin-reducer';
+import authReducer from './reducers/auth-reducer';
+import collectionReducer from './reducers/collection-reducer';
+import collectionsReducer from './reducers/collections-reducer';
+import homeReducer from './reducers/home-reducer';
+import searchReducer from './reducers/search-reducer';
+import userReducer from './reducers/user-reducer';
 
-const store = configureStore({
-  reducer: rootReducer,
+export const store = configureStore({
+  reducer: {
+    auth: authReducer,
+    user: userReducer,
+    home: homeReducer,
+    collection: collectionReducer,
+    collections: collectionsReducer,
+    admin: adminReducer,
+    search: searchReducer,
+  },
   middleware: [thunkMiddleware],
 });
 
-export type AppStore = typeof store;
-export type RootState = ReturnType<AppStore['getState']>;
+export type AppStateType = ReturnType<typeof store.getState>;
+export type AppDispatchType = typeof store.dispatch;
 
-export type AppDispatch = typeof store.dispatch;
-
-export type TypedDispatch = ThunkDispatch<RootState, never, AnyAction>;
-export const useTypedDispatch = () => useDispatch<TypedDispatch>();
-export const useTypedSelector: TypedUseSelectorHook<RootState> = useSelector;
+declare global {
+  interface Window {
+    store: any;
+  }
+}
+window.store = store;
 
 export default store;

@@ -5,41 +5,11 @@ import React, {
   createContext,
   useContext,
   useMemo,
-  useEffect,
 } from 'react';
-import { ILanguage } from '../types';
 
-export enum LanguageEnum {
-  eng = 'eng',
-  by = 'by',
-}
-
-export const languages: { [key in LanguageEnum]: ILanguage } = {
+export const languages = {
   eng: {
     mode: 'eng',
-    common: {
-      appName: 'Collections',
-      collections: 'Collections',
-      carouselTitle: 'Explore collections',
-      createCollection: 'Create collection',
-      addItem: 'Add item',
-      emptyCollections: 'Your library is empty. Create your first collection.',
-      noItems: 'No items yet',
-      save: 'Save',
-      itemTitle: 'Item title',
-      itemDescription: 'Description',
-      profile: 'Profile',
-      email: 'Email',
-      role: 'Role',
-      status: 'Status',
-      tags: 'Tags',
-      comments: 'Comments',
-      addComment: 'Add comment',
-      like: 'Like',
-      unlike: 'Unlike',
-      image: 'Image',
-      chooseImage: 'Choose image',
-    },
     auth: {
       signUp: 'Sign Up',
       login: 'Login',
@@ -48,20 +18,6 @@ export const languages: { [key in LanguageEnum]: ILanguage } = {
       name: 'Name',
       surname: 'Surname',
       confirmPassword: 'Confirm password',
-      errors: {
-        validEmail: 'Enter a valid email',
-        emailRequired: 'Email is required',
-        passwordMin: 'Password should be at least 2 characters long',
-        passwordRequired: 'Password is required',
-        nameMin: 'Name must have at least 2 letters',
-        nameMax: 'Name must have less than 30 letters',
-        nameRequired: 'Name is required',
-        surnameMin: 'Surname must have at least 2 letters',
-        surnameMax: 'Surname must have less than 30 letters',
-        surnameRequired: 'Surname is required',
-        confirmRequired: 'Please confirm your password.',
-        passwordMatch: 'Your passwords do not match.',
-      },
     },
     search: 'Search',
     userPage: {
@@ -87,8 +43,6 @@ export const languages: { [key in LanguageEnum]: ILanguage } = {
       putEdit: 'Make an edit',
       filterCleaning: 'Reset filter',
       export: 'Export',
-      ready: 'Ready',
-      addPhoto: 'Add photo',
       title: 'Title',
       tags: 'Tags',
       likes: 'Likes',
@@ -105,7 +59,6 @@ export const languages: { [key in LanguageEnum]: ILanguage } = {
       description: 'Description',
       nameField: 'Name field',
       nameOption: 'Name option',
-      addPhoto: 'Add photo',
       numbers: 'Fields for entering numbers',
       texts: 'Fields for entering single-line text',
       dates: 'Fields for entering dates',
@@ -113,7 +66,6 @@ export const languages: { [key in LanguageEnum]: ILanguage } = {
       radioFields: 'Fields with yes/no selection',
       checkboxFields: 'Fields with multiple choices',
       delete: 'Delete',
-      ready: 'Ready',
       addField: 'Add field',
       reset: 'Reset',
       confirm: 'Confirm',
@@ -152,29 +104,6 @@ export const languages: { [key in LanguageEnum]: ILanguage } = {
   },
   by: {
     mode: 'by',
-    common: {
-      appName: 'Калекцыі',
-      collections: 'Калекцыі',
-      carouselTitle: 'Агляд калекцый',
-      createCollection: 'Стварыць калекцыю',
-      addItem: 'Дадаць элемент',
-      emptyCollections: 'Ваша бібліятэка пустая. Стварыце першую калекцыю.',
-      noItems: 'Элементаў пакуль няма',
-      save: 'Захаваць',
-      itemTitle: 'Назва элемента',
-      itemDescription: 'Апісанне',
-      profile: 'Профіль',
-      email: 'Электронная пошта',
-      role: 'Роля',
-      status: 'Статус',
-      tags: 'Тэгі',
-      comments: 'Каментары',
-      addComment: 'Дадаць каментар',
-      like: 'Падабаецца',
-      unlike: 'Не падабаецца',
-      image: 'Выява',
-      chooseImage: 'Выбраць выяву',
-    },
     auth: {
       signUp: 'Зарэгістравацца',
       login: 'Увайсці',
@@ -183,20 +112,6 @@ export const languages: { [key in LanguageEnum]: ILanguage } = {
       name: 'Імя',
       surname: 'Прозвішча',
       confirmPassword: 'Пацвердзіць пароль',
-      errors: {
-        validEmail: 'Увядзіце карэктны адрас электроннай пошты',
-        emailRequired: 'Увядзіце адрас электроннай пошты',
-        passwordMin: 'Пароль павінен мець не менш за 2 сімвалы',
-        passwordRequired: 'Увядзіце пароль',
-        nameMin: 'Імя павінна мець не менш за 2 літары',
-        nameMax: 'Імя павінна мець менш за 30 літар',
-        nameRequired: 'Увядзіце імя',
-        surnameMin: 'Прозвішча павінна мець не менш за 2 літары',
-        surnameMax: 'Прозвішча павінна мець менш за 30 літар',
-        surnameRequired: 'Увядзіце прозвішча',
-        confirmRequired: 'Пацвердзіце пароль.',
-        passwordMatch: 'Паролі не супадаюць.',
-      },
     },
     search: 'Знайсці',
     adminPage: {
@@ -219,7 +134,7 @@ export const languages: { [key in LanguageEnum]: ILanguage } = {
       edit: 'Рэдагаваць',
       delete: 'Кошык',
       putDelete: 'Закінуць у кошык',
-      addPhoto: 'Дадаць фота',
+      addPhoto: 'Add photo',
       putEdit: 'Зрабіць выпраўленні',
       filterCleaning: 'Ачысціць фільтр',
       export: 'Экспарт',
@@ -229,7 +144,7 @@ export const languages: { [key in LanguageEnum]: ILanguage } = {
       actions: 'Дзеянні',
       rowsPerPage: 'Радкоў на старонцы',
       created: 'Створана',
-      ready: 'Гатова',
+      ready: 'Ready',
     },
     collectionsPage: {
       myCollections: 'Мае калекцыі',
@@ -287,41 +202,41 @@ export const languages: { [key in LanguageEnum]: ILanguage } = {
   },
 };
 
-interface ILanguageContext {
-  language: ILanguage;
-  setLanguage: (language: LanguageEnum) => void;
+type LanguageType = 'eng' | 'by';
+
+interface ILanguage {
+  language: any;
+  setLanguage:(language: any) => void;
 }
 
-export function setLanguageValue(value: LanguageEnum) {
+export function setLanguageValue(value: LanguageType) {
   localStorage.setItem('language', value);
 }
 
 export function getLanguage() {
-  return localStorage.getItem('language') as LanguageEnum | null;
+  return localStorage.getItem('language') as LanguageType | null;
 }
 
-const LanguageContext = createContext<ILanguageContext | null>(null);
+const LanguageContext = createContext<ILanguage | null>(null);
 
 export const LanguageContextProvider: FC<{ children: ReactElement }> = ({
   children,
 }) => {
-  const [language, setLanguage] = useState<ILanguage>(
-    languages[getLanguage() || 'eng']
-  );
+  const [language, setLanguage] = useState(languages[getLanguage() || 'eng']);
 
-  const handleSetLanguage = (language: LanguageEnum) => {
+  const handleSetLanguage = (language: LanguageType) => {
     setLanguage(languages[language]);
 
     setLanguageValue(language);
   };
 
-  useEffect(() => {
-    if (!getLanguage()) setLanguageValue(LanguageEnum.eng);
-  }, []);
+  if (!getLanguage()) {
+    handleSetLanguage('eng');
+  }
 
   const languageProviderValue = useMemo(
     () => ({ language, setLanguage: handleSetLanguage }),
-    [language]
+    [language],
   );
 
   return (

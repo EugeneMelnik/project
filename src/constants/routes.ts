@@ -4,14 +4,14 @@ enum RoutesApp {
   Admin = '/admin',
   Root = '/',
   Home = '/home',
-  Profile = '/profile',
+  User = '/profile',
   Collections = '/collections/*',
   CollectionsLink = '/collections/',
   Collection = '/collection/:collectionId/*',
   CollectionLink = '/collection/',
   Item = '/item/:itemId',
+  TargetCollections = '/user/:userId',
   ItemLink = '/item/',
-  User = '/user/:userId',
   Search = '/search/',
 }
 

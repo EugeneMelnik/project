@@ -1,121 +1,167 @@
-export interface ICredentials {
-  email: string;
-  password: string;
-}
-
-export interface CreateUserDto {
-  name: string;
-  surname: string;
-  email: string;
-  password: string;
-}
-
-export enum RolesEnum {
-  Admin = 'Admin',
-  User = 'User',
-  Reader = 'Reader',
-}
-
-export enum UserStatusEnum {
-  active = 'active',
-  blocked = 'blocked',
-}
-
-export enum SubjectEnum {
-  books = 'books',
-  movies = 'movies',
-  bands = 'bands',
-  memories = 'memories',
-  artworks = 'artworks',
-}
-
-export enum CommentStateEnum {
-  touched = 'touched',
-  untouched = 'untouched',
-}
-
-export interface IComment {
-  id: number;
+export interface CommentType {
   content: string;
-  user: IUser;
-  item: IItem;
-  state: CommentStateEnum;
+  user: {
+    name: string;
+    surname: string;
+    id: number;
+  };
+  status: 'touched' | 'untouched';
   createdAt: string;
-  updatedAt: string;
 }
 
-export interface ILike {
-  id: number;
-  user: IUser;
-  item: IItem;
+export interface UntouchedCommentType {
+  comments: CommentType[];
+  icon: null | string;
+  title: string;
+  collectionId: string;
+  itemId: string;
 }
 
-export interface IItem {
+export interface ItemInitType {
+  collectionId: number;
+  title: string;
+  tags: string;
+  icon: any;
+  comments: CommentType[] | null;
+  dateValue1?: string;
+  dateValue2?: string;
+  dateValue3?: string;
+  multiLineValue1?: string;
+  multiLineValue2?: string;
+  multiLineValue3?: string;
+  numberValue1?: string;
+  numberValue2?: string;
+  numberValue3?: string;
+  textValue1?: string;
+  textValue2?: string;
+  textValue3?: string;
+  checkboxValues1?: string;
+  checkboxValues2?: string;
+  checkboxValues3?: string;
+}
+export interface ItemType {
   id: number;
   title: string;
-  icon: string;
-  tags: ITag[];
-  likes: ILike[];
-  comments: IComment[];
-  collection: ICollection;
+  tags: { content: string }[] | null;
+  likes: { itemId: number }[] | null;
+  icon: any;
+  isEdit: boolean;
+  isDelete: boolean;
+  collectionId?: string;
+  comments: CommentType[] | null;
+  radioValue1?: string;
+  radioValue2?: string;
+  radioValue3?: string;
+  dateValue1?: string;
+  dateValue2?: string;
+  dateValue3?: string;
+  multiLineValue1?: string;
+  multiLineValue2?: string;
+  multiLineValue3?: string;
+  numberValue1?: string;
+  numberValue2?: string;
+  numberValue3?: string;
+  textValue1?: string;
+  textValue2?: string;
+  textValue3?: string;
+  checkboxValues1?: string;
+  checkboxValues2?: string;
+  checkboxValues3?: string;
   createdAt: string;
   updatedAt: string;
+  collection?: { user: { name: string; surname: string }; theme: string };
 }
-
-export interface ICollection {
-  id: number;
-  icon: string;
+export interface CollectionInitType {
   title: string;
+  userId: number;
+  theme: string;
+  icon: any;
   description: string;
-  subject: SubjectEnum;
-  items: IItem[];
-  user: IUser;
-  createdAt: string;
-  updatedAt: string;
+  dateKeys: null | string[];
+  multiLineKeys: null | string[];
+  radioKeys: null | string[];
+  numberKeys: null | string[];
+  textKeys: null | string[];
+  checkboxKeys: null | { [keys: string]: string }[];
 }
 
-export interface IUser {
-  id: string;
-  role: RolesEnum;
-  name: string;
-  surname: string;
-  email: string;
-  status: UserStatusEnum;
-  collections: ICollection[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ITag {
-  id: number;
-  content: string;
+export interface CollectionType {
+  id: number | null;
+  icon: any;
+  title: string | null;
+  description: string | null;
+  theme: string | null;
+  allFields: string[];
+  isEdit: boolean;
+  isDelete: boolean;
+  customFields: any;
+  createdAt: string | null;
+  updatedAt: string | null;
+  list: ItemType[] | null;
+  dateKey1: string | null;
+  dateKey2: string | null;
+  dateKey3: string | null;
+  multiLineKey1: string | null;
+  multiLineKey2: string | null;
+  multiLineKey3: string | null;
+  numberKey1: string | null;
+  numberKey2: string | null;
+  numberKey3: string | null;
+  radioKey1: string | null;
+  radioKey2: string | null;
+  radioKey3: string | null;
+  textKey1: string | null;
+  textKey2: string | null;
+  textKey3: string | null;
+  checkboxKey1: string | null;
+  checkboxKey2: string | null;
+  checkboxKey3: string | null;
+  targetItem: ItemType | null;
+  listEditItems: Array<ItemType | null>;
+  listDeleteItems: Array<ItemType | null>;
+  userId: number | null;
+  matchTags: any;
+  untouchedComments: null | UntouchedCommentType[];
+  isLoading: boolean;
 }
 
 export interface CollectionsPageType {
   allCollections:
-    | {
-        id: number;
-        name: string;
-        surname: string;
-        collections: {
-          collections: ICollection[] | null;
-          countCollections: number;
-        };
-      }[]
-    | null;
+  | {
+    id: number;
+    name: string;
+    surname: string;
+    collections: {
+      collections: CollectionType[] | null;
+      countCollections: number;
+    };
+  }[]
+  | null;
   targetCollections: {
     name: string;
     surname: string;
-    collections: Array<ICollection[] | null>;
+    collections: Array<CollectionType[] | null>;
   } | null;
   isLoading: boolean;
 }
 
 export interface HomePageType {
-  collections: ICollection[] | null;
-  list: IItem[] | null;
+  collections: CollectionType[] | null;
+  list: ItemType[] | null;
   tags: { content: string }[] | null;
   isLoading: boolean;
+}
+
+export interface UserType {
+  id: number | null;
+  userId: null | string;
+  role: 'Admin' | 'User';
+  name: string | null;
+  surname: string | null;
+  theme?: 'light' | 'dark';
+  status: 'active' | 'blocked';
+  createdAt: null | string;
+  updatedAt: null | string;
 }
 
 export interface UserPageType {
@@ -131,167 +177,59 @@ export interface UserPageType {
   updatedAt: null | string;
   myCollections: {
     countCollections: number;
-    collections: ICollection[] | null;
+    collections: CollectionType[] | null;
   };
-  listEditCollections: Array<ICollection | null>;
-  listDeleteCollections: Array<ICollection | null>;
+  listEditCollections: Array<CollectionType | null>;
+  listDeleteCollections: Array<CollectionType | null>;
   likes: { itemId: number }[] | null;
   themes: null | { id: number; value: string };
   isLoading: boolean;
 }
 
 export interface SearchPageType {
-  itemsSearch: IItem;
+  itemsSearch: any;
   usersSearch:
-    | {
-        name: string;
-        surname: string;
-        collections: Array<ICollection | null>;
-      }[]
-    | null;
+  | {
+    name: string;
+    surname: string;
+    collections: Array<CollectionType | null>;
+  }[]
+  | null;
   listSearch:
-    | IItem[]
-    | {
-        name: string;
-        surname: string;
-        collections: Array<ICollection | null>;
-      }[]
-    | null;
+  | ItemType[]
+  | {
+    name: string;
+    surname: string;
+    collections: Array<CollectionType | null>;
+  }[]
+  | null;
   isLoading: boolean;
 }
 
+export interface TargetUserType {
+  id: number;
+  userId: string;
+  role: 'Admin' | 'User' | 'Reader';
+  name: string;
+  surname: string;
+  theme?: 'light' | 'dark';
+  status: 'active' | 'blocked';
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AdminType {
-  users: IUser[] | null;
-  targetUser: IUser | null;
+  users: UserType[] | null;
+  targetUser: UserType | null;
   targetCollections: {
-    collections: ICollection[] | null;
+    collections: CollectionType[] | null;
     countCollections: number;
   };
   isLoading: boolean;
 }
 
-export interface ILanguage {
-  mode: string;
-  common: {
-    appName: string;
-    collections: string;
-    carouselTitle: string;
-    createCollection: string;
-    addItem: string;
-    emptyCollections: string;
-    noItems: string;
-    save: string;
-    itemTitle: string;
-    itemDescription: string;
-    profile: string;
-    email: string;
-    role: string;
-    status: string;
-    tags: string;
-    comments: string;
-    addComment: string;
-    like: string;
-    unlike: string;
-    image: string;
-    chooseImage: string;
-  };
-  userPage: { edit: string; delete: string; createCollection: string };
-  modalEditItem: {
-    created: string;
-    update: string;
-    reset: string;
-    title: string;
-    pullOut: string;
-    enterBtn: string;
-    tags: string;
-  };
-  search: string;
-  modalCreateCollection: {
-    nameOption: string;
-    numbers: string;
-    addField: string;
-    description: string;
-    nameField: string;
-    dates: string;
-    title: string;
-    multiLines: string;
-    delete: string;
-    addPhoto: string;
-    confirm: string;
-    texts: string;
-    radioFields: string;
-    ready: string;
-    checkboxFields: string;
-    reset: string;
-    theme: string;
-  };
-  auth: {
-    password: string;
-    surname: string;
-    name: string;
-    confirmPassword: string;
-    login: string;
-    signUp: string;
-    email: string;
-    errors: {
-      validEmail: string;
-      emailRequired: string;
-      passwordMin: string;
-      passwordRequired: string;
-      nameMin: string;
-      nameMax: string;
-      nameRequired: string;
-      surnameMin: string;
-      surnameMax: string;
-      surnameRequired: string;
-      confirmRequired: string;
-      passwordMatch: string;
-    };
-  };
-  adminPage: {
-    unblock: string;
-    blocked: string;
-    removeAdmin: string;
-    active: string;
-    admin: string;
-    block: string;
-    makeAdmin: string;
-    delete: string;
-  };
-  modalDelete: { created: string; pullOut: string; delete: string };
-  collectionPage: {
-    putDelete: string;
-    filterCleaning: string;
-    edit: string;
-    created: string;
-    title: string;
-    delete: string;
-    rowsPerPage: string;
-    addPhoto: string;
-    tags: string;
-    ready: string;
-    createItem: string;
-    putEdit: string;
-    export: string;
-    actions: string;
-    likes: string;
-  };
-  collectionsPage: { myCollections: string };
-  modalEditCollection: {
-    created: string;
-    description: string;
-    update: string;
-    reset: string;
-    theme: string;
-    variants: string;
-    title: string;
-    pullOut: string;
-  };
-  itemPage: {
-    comments: string;
-    created: string;
-    addComment: string;
-    myComments: string;
-    likes: string;
-  };
+export interface UserPersonalInfoType {
+  id: number;
+  name: string;
+  surname: string;
 }

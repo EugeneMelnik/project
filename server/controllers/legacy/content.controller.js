@@ -28,6 +28,12 @@ router.get('/getAllTags', async (_req, res) => {
   try { return res.send(await Tag.findAll()); } catch (error) { return sendError(res, error); }
 });
 
+router.get('/getThemes', async (_req, res) => {
+  try {
+    return res.send(await Subject.findAll({ order: [['id', 'ASC']] }));
+  } catch (error) { return sendError(res, error); }
+});
+
 router.get('/searchMatchTag', async (req, res) => {
   try {
     return res.send(await Tag.findAll({ where: { content: { [Op.like]: `%${req.query.tag || ''}%` } } }));

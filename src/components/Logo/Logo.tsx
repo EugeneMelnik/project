@@ -1,34 +1,40 @@
 import React, { FC } from 'react';
-import { Avatar, Stack } from '@mui/material';
+import { Avatar, Chip, Stack } from '@mui/material';
 import { useNavigate } from 'react-router';
 import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
 import RoutesApp from '../../constants/routes';
-import {
-  userNameSelector,
-  userRoleSelector,
-  userSurnameSelector,
-} from '../../redux/selectors/user-selector';
-import { RolesEnum } from '../../types';
-import { StyledChip } from './Logo.styles';
-import { useTypedSelector } from '../../redux';
 
-const Logo: FC = () => {
-  const name = useTypedSelector(userNameSelector);
-  const surname = useTypedSelector(userSurnameSelector);
-  const role = useTypedSelector(userRoleSelector);
+interface ILogo {
+  name: string;
+  surname: string;
+  role: 'Admin' | 'User';
+}
 
+const Logo: FC<ILogo> = ({ name, surname, role }) => {
   const navigate = useNavigate();
 
-  function handleClickNavigateToAdminPage() {
-    if (role === RolesEnum.User) return;
-
+  function handleClick() {
     navigate(RoutesApp.Admin);
   }
 
   return (
     <Stack direction="row">
-      <StyledChip
-        avatar={
+      <Chip
+        sx={(theme) => ({
+          position: 'relative',
+          fontSize: '1.2rem',
+          paddingLeft: '3rem',
+          height: '2.8rem',
+          borderRadius: '3rem',
+          minWidth: '3rem',
+
+          '& .MuiChip-label': {
+            [theme.breakpoints.down('md')]: {
+              display: 'none',
+            },
+          },
+        })}
+        avatar={(
           <Avatar
             style={{
               position: 'absolute',
@@ -38,12 +44,15 @@ const Logo: FC = () => {
               marginLeft: 0,
             }}
           >
-            {role === RolesEnum.Admin && <RadioButtonCheckedIcon />}
+            {role === 'Admin' ? <RadioButtonCheckedIcon /> : null}
           </Avatar>
-        }
+        )}
         label={`${name} ${surname}`}
-        clickable={role === RolesEnum.Admin}
-        onClick={handleClickNavigateToAdminPage}
+        clickable={role === 'Admin'}
+        onClick={() => {
+          if (role === 'User') return;
+          handleClick();
+        }}
       />
     </Stack>
   );
