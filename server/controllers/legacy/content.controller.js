@@ -1,7 +1,7 @@
 import express from 'express';
 import { Op } from 'sequelize';
 import db from '../../db/models/index.js';
-import { sendError } from './helpers.js';
+import { imageData, sendError } from './helpers.js';
 
 const {
   item: Item,
@@ -10,16 +10,48 @@ const {
   like: Like,
   subject: Subject,
   collection: Collection,
+  user: User,
 } = await db;
 const router = express.Router();
 const filterColumns = new Set(['title']);
 
+router.get('/getLastAddItems', async (_req, res) => {
+  try {
+    const items = await Item.findAll({
+      where: { isDeleted: false },
+      include: [
+        { model: Like, attributes: ['itemId'] },
+        {
+          model: Collection,
+          attributes: ['theme'],
+          include: [{ model: User, attributes: ['id', 'name', 'surname'] }],
+        },
+        { model: Tag, as: 'tags', attributes: ['content', 'createdAt'] },
+      ],
+    });
+
+    items.sort((first, second) => (second.likes?.length || 0) - (first.likes?.length || 0));
+
+    return res.send(items.slice(0, 5).map((item) => {
+      if (item.icon) item.icon = Buffer.from(item.icon).toString('base64');
+      return item;
+    }));
+  } catch (error) { return sendError(res, error); }
+});
+
 router.get('/getItem', async (req, res) => {
   try {
-    return res.send(await Item.findOne({
-      where: { id: req.query.itemId },
-      include: [{ model: Comment }, { model: Collection }],
-    }));
+    const item = await Item.findOne({
+      where: { id: req.query.itemId, isDeleted: false },
+      include: [
+        {
+          model: Comment,
+          include: [{ model: User, attributes: ['id', 'name', 'surname'] }],
+        },
+        { model: Collection },
+      ],
+    });
+    return res.send(imageData(item));
   }
   catch (error) { return sendError(res, error); }
 });
@@ -42,14 +74,62 @@ router.get('/searchMatchTag', async (req, res) => {
 
 router.get('/searchItemsByTag', async (req, res) => {
   try {
-    return res.send(await Item.findAll({ include: [{ model: Tag, where: { content: req.query.tag } }] }));
+    const items = await Item.findAll({
+      where: { isDeleted: false },
+      include: [
+        { model: Tag, where: { content: req.query.tag } },
+        { model: Like, attributes: ['itemId'] },
+        {
+          model: Collection,
+          include: [{ model: User, attributes: ['id', 'name', 'surname'] }],
+        },
+      ],
+    });
+    return res.send(items.map((item) => imageData(item)));
   } catch (error) { return sendError(res, error); }
 });
 
 router.get('/search', async (req, res) => {
   try {
     const value = `%${req.query.substr || ''}%`;
-    return res.send(await Item.findAll({ where: { title: { [Op.like]: value } } }));
+    const items = await Item.findAll({
+      where: {
+        isDeleted: false,
+        [Op.or]: [
+          { title: { [Op.like]: value } },
+          { '$collection.title$': { [Op.like]: value } },
+          { '$collection.description$': { [Op.like]: value } },
+          { '$tags.content$': { [Op.like]: value } },
+        ],
+      },
+      include: [
+        { model: Like, attributes: ['itemId'] },
+        {
+          model: Collection,
+          include: [{ model: User, attributes: ['id', 'name', 'surname'] }],
+        },
+        { model: Tag, as: 'tags', attributes: ['content'] },
+      ],
+    });
+    const collections = await Collection.findAll({
+      where: {
+        isDeleted: false,
+        [Op.or]: [
+          { title: { [Op.like]: value } },
+          { description: { [Op.like]: value } },
+          { subject: { [Op.like]: value } },
+        ],
+      },
+      include: [{ model: Item, where: { isDeleted: false }, required: false }],
+    });
+    return res.send({
+      items: items.map((item) => imageData(item)),
+      collections: collections.map((collection) => {
+        collection.items = collection.items.map((item) => imageData(item));
+        collection.list = collection.items;
+        return collection;
+      }),
+    });
   } catch (error) { return sendError(res, error); }
 });
 
@@ -67,7 +147,13 @@ router.post('/toogleLike', async (req, res) => {
 });
 
 router.get('/getAllComments', async (req, res) => {
-  try { return res.send(await Comment.findAll({ where: { itemId: req.query.itemId } })); }
+  try {
+    return res.send(await Comment.findAll({
+      where: { itemId: req.query.itemId },
+      include: [{ model: User, attributes: ['id', 'name', 'surname'] }],
+      order: [['createdAt', 'ASC']],
+    }));
+  }
   catch (error) { return sendError(res, error); }
 });
 
@@ -89,7 +175,35 @@ router.put('/setCommentsTouched', async (req, res) => {
 });
 
 router.get('/getAllUntouchedComments', async (_req, res) => {
-  try { return res.send(await Comment.findAll({ where: { state: 'untouched' } })); }
+  try {
+    const collections = await Collection.findAll({
+      where: { userId: _req.query.userId },
+      include: [{
+        model: Item,
+        include: [{
+          model: Comment,
+          where: { state: 'untouched' },
+          required: true,
+          include: [{ model: User, attributes: ['id', 'name', 'surname'] }],
+        }],
+      }],
+    });
+    const notifications = [];
+
+    collections.forEach((collection) => {
+      collection.items.forEach((item) => {
+        notifications.push({
+          icon: item.icon ? Buffer.from(item.icon).toString('base64') : null,
+          title: item.title,
+          collectionId: item.collectionId,
+          comments: item.comments,
+          itemId: item.id,
+        });
+      });
+    });
+
+    return res.send(notifications);
+  }
   catch (error) { return sendError(res, error); }
 });
 

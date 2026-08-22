@@ -5,6 +5,7 @@ import { UserActionTypes } from '../actions/user-action';
 
 const initState: CollectionType = {
   id: null,
+  isDeleted: false,
   icon: null,
   title: null,
   description: null,
@@ -68,6 +69,7 @@ function collectionReducer(state = initState, action: AnyAction) {
       return {
         ...state,
         id: action.collection.id,
+        isDeleted: action.collection.isDeleted,
         icon: action.collection.icon,
         description: action.collection.description,
         theme: action.collection.theme,
@@ -89,6 +91,12 @@ function collectionReducer(state = initState, action: AnyAction) {
       return {
         ...state,
         targetItem: action.item,
+      };
+    }
+    case CollectionActionTypes.ClearTargetItem: {
+      return {
+        ...state,
+        targetItem: null,
       };
     }
     case CollectionActionTypes.SetTargetCollectionItems: {
@@ -122,6 +130,9 @@ function collectionReducer(state = initState, action: AnyAction) {
       return {
         ...state,
         list: [...state.list!.filter((item) => item.id !== action.itemId)],
+        listDeleteItems: state.listDeleteItems.map((item) =>
+          item?.id === action.itemId ? { ...item, isDeleted: true } : item
+        ),
       };
     }
     case CollectionActionTypes.UpdateListItems: {
@@ -213,17 +224,6 @@ function collectionReducer(state = initState, action: AnyAction) {
         listDeleteItems: Array.isArray(action.items) ? [...action.items] : [],
       };
     }
-    case CollectionActionTypes.PullOutItem: {
-      return {
-        ...state,
-        listEditItems: state.listEditItems.filter(
-          (collection) => collection?.id !== action.itemId
-        ),
-        listDeleteItems: state.listDeleteItems.filter(
-          (collection) => collection?.id !== action.itemId
-        ),
-      };
-    }
     case UserActionTypes.increaseLikes: {
       const newList = state.list?.map((item) => {
         if (item.id === action.itemId) {
@@ -258,6 +258,7 @@ function collectionReducer(state = initState, action: AnyAction) {
       return {
         ...state,
         id: null,
+        isDeleted: false,
         icon: null,
         title: null,
         description: null,

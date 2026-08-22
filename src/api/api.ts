@@ -11,6 +11,24 @@ import { logError } from '../services/logger';
 
 const baseURL = process.env.REACT_APP_BASE_URL;
 
+const appendFormDataValue = (
+  formData: FormData,
+  key: string,
+  value: unknown
+) => {
+  if (value === null || value === undefined || value === '') return;
+  if (Array.isArray(value) && value.length === 0) return;
+
+  formData.append(
+    key,
+    value instanceof File
+      ? value
+      : key === 'tags'
+      ? JSON.stringify(value)
+      : String(value)
+  );
+};
+
 export const API = {
   SignUpUser: '/api/user/signup',
   LoginUser: '/api/user/login',
@@ -38,8 +56,6 @@ export const API = {
   GetDeleteItems: '/api/getDeleteItems',
   UpdateCollection: '/api/updateCollection',
   UpdateItem: '/api/updateItem',
-  PullOutCollection: '/api/pullOutCollection',
-  PullOutItem: '/api/pullOutItem',
   GetTargetUser: '/api/getTargetUser',
   GetTargetCollections: '/api/getTargetCollections',
   Search: '/api/search',
@@ -507,30 +523,16 @@ export const requestAPI = {
       .then((response) => response.data)
       .catch((error) => logError(error.message));
   },
-  pullOutItem(itemId: number) {
-    return axios
-      .put(baseURL + API.PullOutItem, { itemId })
-      .then((response) => response.data)
-      .catch((error) => logError(error.message));
-  },
-  pullOutCollection(collectionId: number) {
-    return axios
-      .put(baseURL + API.PullOutCollection, { collectionId })
-      .then((response) => response.data)
-      .catch((error) => logError(error.message));
-  },
   updateCollection(collectionInfo: CollectionUpdateType) {
     const formData = new FormData();
 
-    // need to find another way
-    Object.keys(collectionInfo).forEach((key: string) =>
-      formData.append(
+    Object.keys(collectionInfo).forEach((key: string) => {
+      appendFormDataValue(
+        formData,
         key,
-        collectionInfo[key as keyof CollectionUpdateType] instanceof File
-          ? (collectionInfo[key as keyof CollectionUpdateType] as File)
-          : String(collectionInfo[key as keyof CollectionUpdateType])
-      )
-    );
+        collectionInfo[key as keyof CollectionUpdateType]
+      );
+    });
 
     return axios
       .put(baseURL + API.UpdateCollection, formData, {
@@ -544,15 +546,9 @@ export const requestAPI = {
   updateItem(itemInfo: ItemUpdateType) {
     const formData = new FormData();
 
-    // need to find another way
-    Object.keys(itemInfo).forEach((key: string) =>
-      formData.append(
-        key,
-        itemInfo[key as keyof ItemType] instanceof File
-          ? (itemInfo[key as keyof ItemType] as File)
-          : String(itemInfo[key as keyof ItemType])
-      )
-    );
+    Object.keys(itemInfo).forEach((key: string) => {
+      appendFormDataValue(formData, key, itemInfo[key as keyof ItemType]);
+    });
 
     return axios
       .put(baseURL + API.UpdateItem, formData, {

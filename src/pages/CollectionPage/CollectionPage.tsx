@@ -1,9 +1,10 @@
 import { CustomFieldType, IconValue, ItemInitType, ItemType, ItemUpdateType, MatchTagType } from '../../types';
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import {
   Avatar,
   Badge,
   Box,
+  Button,
   Grid,
   ListItemButton,
   ListItemIcon,
@@ -45,7 +46,6 @@ interface ICollectionPage {
   listDeleteItems: Array<ItemType | null>;
   setEditItems: (itemIds: number[]) => void;
   setDeleteItems: (itemIds: number[]) => void;
-  pullOutItem: (itemId: number) => void;
   deleteItem: (itemId: number) => void;
   updateItem: (item: ItemUpdateType) => void;
   toogleLike: (userId: number, itemId: number) => void;
@@ -71,7 +71,6 @@ const CollectionPage: FC<ICollectionPage> = ({
   listDeleteItems,
   setEditItems,
   setDeleteItems,
-  pullOutItem,
   deleteItem,
   updateItem,
   toogleLike,
@@ -88,6 +87,10 @@ const CollectionPage: FC<ICollectionPage> = ({
 
   const { language } = useLanguage();
 
+  useEffect(() => {
+    if (listEditItems.length) setOpenModalEdit(true);
+  }, [listEditItems]);
+
   return (
     <>
       <ModalEditItem
@@ -95,7 +98,6 @@ const CollectionPage: FC<ICollectionPage> = ({
         openModal={openModalEdit}
         setOpen={setOpenModalEdit}
         itemsEdit={listEditItems}
-        pullOutItem={pullOutItem}
         updateItem={updateItem}
         searchMatchTags={searchMatchTags}
         matchTags={matchTags}
@@ -104,7 +106,6 @@ const CollectionPage: FC<ICollectionPage> = ({
         openModal={openModalDelete}
         setOpen={setOpenModalDelete}
         itemsDel={listDeleteItems}
-        pullOutItem={pullOutItem}
         deleteItem={deleteItem}
       />
       {customFields && (
@@ -118,12 +119,36 @@ const CollectionPage: FC<ICollectionPage> = ({
           matchTags={matchTags}
         />
       )}
+      {(authorId === userId || role === 'Admin') && (
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, flexWrap: 'wrap', px: { xs: 1.5, md: 4 }, py: 2 }}>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpenForm(true)}>
+            {language.collectionPage.createItem}
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<EditIcon />}
+            disabled={listEditItems.length === 0}
+            onClick={() => setOpenModalEdit(true)}
+          >
+            {language.collectionPage.edit} ({listEditItems.length})
+          </Button>
+          <Button
+            color="error"
+            variant="outlined"
+            startIcon={<DeleteIcon />}
+            disabled={listDeleteItems.length === 0}
+            onClick={() => setOpenModalDelete(true)}
+          >
+            {language.collectionPage.delete} ({listDeleteItems.length})
+          </Button>
+        </Box>
+      )}
       <Grid
         sx={{ height: '100%' }}
         container
         columnSpacing={{ xs: 1, sm: 2, md: 3 }}
       >
-        <Grid item lg={2.5} md={2.7} xs={12} sm={12}>
+        <Grid item sx={{ display: 'none' }} lg={2.5} md={2.7} xs={12} sm={12}>
           {(authorId === userId || role === 'Admin') && (
             <Sidebar>
               <StyledListItemButton
@@ -219,7 +244,7 @@ const CollectionPage: FC<ICollectionPage> = ({
             </Sidebar>
           )}
         </Grid>
-        <Grid item={false} lg={9.5} md={9.3} xs={12} sm={12}>
+        <Grid item={false} lg={12} md={12} xs={12} sm={12} sx={{ width: '100%' }}>
           <Box
             sx={(theme) => ({
               display: 'flex',
@@ -231,13 +256,13 @@ const CollectionPage: FC<ICollectionPage> = ({
               },
             })}
           >
-            <Avatar
-              src={`data:application/pdf;base64,${icon}`}
-              alt="mmmmm"
-              sx={{ width: '10rem', height: '10rem' }}
-            >
-              {icon && 'Empty'}
-            </Avatar>
+            {icon && (
+              <Avatar
+                src={`data:application/pdf;base64,${icon}`}
+                alt={theme}
+                sx={{ width: '10rem', height: '10rem' }}
+              />
+            )}
             <Box>
               <Typography variant="h2">{theme}</Typography>
               <Typography variant="body2">
@@ -245,6 +270,12 @@ const CollectionPage: FC<ICollectionPage> = ({
                 {' '}
                 {moment(createdAt).format('DD/MM/YYYY')}
               </Typography>
+              {description && (
+                <MDEditor.Markdown
+                  source={description.replace(/&&#&&/gim, '\n')}
+                  style={{ backgroundColor: 'transparent', marginTop: '0.75rem' }}
+                />
+              )}
             </Box>
           </Box>
           {description && (

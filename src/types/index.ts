@@ -51,6 +51,7 @@ export interface ItemInitType {
 }
 export interface ItemType {
   id: number;
+  isDeleted: boolean;
   title: string;
   tags: { content: string }[] | null;
   likes: { itemId: number }[] | null;
@@ -79,7 +80,11 @@ export interface ItemType {
   checkboxValues3?: string;
   createdAt: string;
   updatedAt: string;
-  collection?: { user: { name: string; surname: string }; theme: string };
+  collection?: {
+    user: { id: number; name: string; surname: string };
+    theme: string;
+    description?: string;
+  };
 }
 export interface CollectionInitType {
   title: string;
@@ -97,6 +102,7 @@ export interface CollectionInitType {
 
 export interface CollectionUpdateType {
   collectionId: number;
+  title?: string;
   icon: IconValue;
   description: string | null;
   theme: string | null;
@@ -122,6 +128,7 @@ export interface CollectionUpdateType {
 
 export interface CollectionType {
   id: number | null;
+  isDeleted: boolean;
   icon: IconValue;
   title: string | null;
   description: string | null;

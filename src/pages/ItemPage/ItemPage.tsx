@@ -6,6 +6,7 @@ import {
   Checkbox,
   Chip,
   Grid,
+  Paper,
   TextareaAutosize,
   Typography,
 } from '@mui/material';
@@ -13,13 +14,17 @@ import { useParams } from 'react-router';
 import moment from 'moment';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import TagIcon from '@mui/icons-material/Tag';
+import MDEditor from '@uiw/react-md-editor';
 import { CustomFieldType, ItemType } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
+import RoutesApp from '../../constants/routes';
+import { Link as RouterLink } from 'react-router-dom';
 
 interface IItemPage {
   userId: number;
   targetItem: ItemType;
   getTargetItem: (itemId: number, collectionId: number) => void;
+  clearTargetItem: () => void;
   toggleLike: (userId: number, itemId: number) => void;
   likes: { itemId: number }[] | null;
   getAllComments: (itemId: number) => void;
@@ -31,6 +36,7 @@ interface IItemPage {
 const ItemPage: FC<IItemPage> = ({
   targetItem,
   getTargetItem,
+  clearTargetItem,
   toggleLike,
   userId,
   likes,
@@ -47,11 +53,12 @@ const ItemPage: FC<IItemPage> = ({
 
   useEffect(() => {
     if (collectionId && itemId) {
-      if (!targetItem) getTargetItem(+itemId, +collectionId);
+      clearTargetItem();
+      getTargetItem(+itemId, +collectionId);
       setCommentsTouched(+itemId);
       getAllComments(+itemId);
     }
-  }, []);
+  }, [collectionId, itemId]);
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -76,36 +83,59 @@ const ItemPage: FC<IItemPage> = ({
   }
 
   return (
-    <Grid sx={{ height: '100%' }} container>
+    <Grid sx={{ minHeight: '100%', py: { xs: 2, md: 4 } }} container>
       {targetItem && (
-        <Box sx={{ flex: 1 }}>
-          <Checkbox
-            checked={!!likes?.find((like) => like.itemId === targetItem.id)}
-            color="error"
-            icon={<FavoriteBorder color="error" />}
-            checkedIcon={<Favorite color="error" />}
-            onChange={() => {
-              if (userId && targetItem.id) {
-                toggleLike(userId, targetItem.id);
-              }
-            }}
-          />
-          <Typography variant="h2">{targetItem.title}</Typography>
-          <Typography variant="body1">
-            {targetItem.likes ? targetItem.likes.length : 0}
-            {' '}
-            {language.itemPage.likes}
-          </Typography>
-          <Typography variant="body1">
-            {language.itemPage.created}
-            {' '}
-            {moment(targetItem.createdAt).format('DD/MM/YYYY')}
-          </Typography>
-          <Avatar
-            src={`data:application/pdf;base64,${String(targetItem.icon || '')}`}
-            sx={{ width: '10rem', height: '10rem' }}
-          />
-          <Box>
+        <Box sx={{ flex: 1, width: '100%', maxWidth: '1800px', mx: 'auto', px: { xs: 1, md: 3 } }}>
+          <Paper variant="outlined" sx={{ p: { xs: 2, md: 4 }, mb: 3 }}>
+            <Box sx={{ display: 'flex', gap: 3, alignItems: 'center', flexWrap: 'wrap' }}>
+              {targetItem.icon && (
+                <Avatar
+                  src={`data:application/pdf;base64,${String(targetItem.icon)}`}
+                  sx={{ width: { xs: '8rem', md: '10rem' }, height: { xs: '8rem', md: '10rem' } }}
+                />
+              )}
+              <Box sx={{ flex: 1, minWidth: '14rem' }}>
+                {targetItem.collectionId && (
+                  <Typography
+                    component={RouterLink}
+                    to={`${RoutesApp.CollectionLink}${targetItem.collectionId}`}
+                    variant="overline"
+                    sx={{ color: 'secondary.main', textDecoration: 'none' }}
+                  >
+                    {targetItem.collection?.theme || 'Collection'}
+                  </Typography>
+                )}
+                <Typography variant="overline">{language.itemPage.created}</Typography>
+                <Typography variant="h2" sx={{ mb: 1 }}>{targetItem.title}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {moment(targetItem.createdAt).format('DD/MM/YYYY')}
+                </Typography>
+                {targetItem.collection?.description && (
+                  <Box sx={{ mt: 1, maxWidth: '48rem', opacity: 0.8 }}>
+                    <MDEditor.Markdown
+                      source={targetItem.collection.description.replace(/&&#&&/gim, '\n')}
+                      style={{ backgroundColor: 'transparent' }}
+                    />
+                  </Box>
+                )}
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <Checkbox
+                  checked={!!likes?.find((like) => like.itemId === targetItem.id)}
+                  color="error"
+                  icon={<FavoriteBorder color="error" />}
+                  checkedIcon={<Favorite color="error" />}
+                  onChange={() => {
+                    if (userId && targetItem.id) toggleLike(userId, targetItem.id);
+                  }}
+                />
+                <Typography variant="body2">
+                  {targetItem.likes ? targetItem.likes.length : 0} {language.itemPage.likes}
+                </Typography>
+              </Box>
+            </Box>
+          </Paper>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 3 }}>
             {targetItem.tags?.map((tag, idx: number) => (
               <Chip
                 icon={<TagIcon />}
@@ -146,10 +176,9 @@ const ItemPage: FC<IItemPage> = ({
                 );
               },
             )}
-          <hr />
-          <Typography variant="h2">{language.itemPage.comments}</Typography>
-          {/* {isAuth && ( */}
-          <form onSubmit={handleSubmit}>
+          <Paper variant="outlined" sx={{ p: { xs: 2, md: 3 }, mt: 3 }}>
+            <Typography variant="h4" sx={{ mb: 2 }}>{language.itemPage.comments}</Typography>
+            <form onSubmit={handleSubmit}>
             <Box
               sx={{
                 display: 'flex',
@@ -158,24 +187,27 @@ const ItemPage: FC<IItemPage> = ({
               }}
             >
               <TextareaAutosize
-                style={{ flex: 1 }}
+                style={{ flex: 1, padding: '0.8rem', font: 'inherit', minHeight: '3rem' }}
                 placeholder={language.itemPage.addComment}
                 required
                 value={value}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setValue(e.target.value)}
               />
-              <Button type="submit">{language.itemPage.addComment}</Button>
+              <Button variant="contained" type="submit">{language.itemPage.addComment}</Button>
             </Box>
-          </form>
-          {/* )} */}
-          <hr />
-          {targetItem.comments
-                && targetItem.comments.map((comment) => (
+            </form>
+          </Paper>
+          <Box sx={{ mt: 2, display: 'grid', gap: 1 }}>
+              {targetItem.comments
+                && targetItem.comments.filter((comment) => comment?.user).map((comment) => (
                   <Box
                     sx={{
                       position: 'relative',
-                      backgroundColor:
-                        comment.status === 'untouched' ? 'gray' : 'none',
+                      backgroundColor: comment.status === 'untouched' ? 'action.hover' : 'background.paper',
+                      border: 1,
+                      borderColor: 'divider',
+                      borderRadius: 1,
+                      p: 2,
                     }}
                     key={comment.createdAt}
                   >
@@ -205,7 +237,8 @@ const ItemPage: FC<IItemPage> = ({
                     <Typography variant="body2">{comment.content}</Typography>
                   </Box>
                 ))}
-        </Box>
+          </Box>
+          </Box>
       )}
     </Grid>
 

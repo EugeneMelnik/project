@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
     position: 'relative',
     width: '60%',
     minWidth: '300px',
-    height: '500px',
+    maxHeight: '80vh',
 
     [theme.breakpoints.down('sm')]: {
       width: '100%',
@@ -108,7 +108,6 @@ interface IModalEditCollection {
   setOpen: (state: boolean) => void;
   collectionsEdit: Array<CollectionType | null>;
   updateCollection: (collection: CollectionUpdateType) => void;
-  pullOutCollection: (collectionId: number) => void;
   collectionThemes: { id: number; value: string }[] | null;
 }
 
@@ -117,7 +116,6 @@ const ModalEditCollection: FC<IModalEditCollection> = ({
   setOpen,
   collectionsEdit,
   updateCollection,
-  pullOutCollection,
   collectionThemes,
 }) => {
   const [image, setImage] = useState<IconValue>();
@@ -167,6 +165,7 @@ const ModalEditCollection: FC<IModalEditCollection> = ({
     onSubmit: (values, { resetForm }) => {
       updateCollection({
         collectionId,
+        title: values.title,
         icon: image || null,
         description: description.replace(/\n/gim, '&&#&&'),
         theme: values.theme,
@@ -236,7 +235,6 @@ const ModalEditCollection: FC<IModalEditCollection> = ({
         },
       });
 
-      pullOutCollection(collectionId);
     },
     onReset: () => {
       setImage('');
@@ -497,18 +495,6 @@ const ModalEditCollection: FC<IModalEditCollection> = ({
                       onClick={formik.handleReset}
                     >
                       Reset
-                    </Button>
-                    <Button
-                      sx={{
-                        flex: 1,
-                      }}
-                      onClick={() => {
-                        if (collection.id) {
-                          pullOutCollection(collection.id);
-                        }
-                      }}
-                    >
-                      Pull out
                     </Button>
                   </Box>
                 </ListItem>

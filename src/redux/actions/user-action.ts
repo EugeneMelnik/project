@@ -26,7 +26,6 @@ export enum UserActionTypes {
   updateEditCollections = 'UPDATE-EDIT-COLLECTIONS',
   setDeleteCollections = 'SET-DELETE-COLLECTIONS',
   updateDeleteCollections = 'UPDATE-DELETE-COLLECTIONS',
-  pullOutCollectionAction = 'PULL-OUT-COLLECTION',
   setLike = 'SET-LIKE',
   setDislike = 'SET-DISLIKE',
   increaseLikes = 'INCREASE-LIKES',
@@ -39,6 +38,7 @@ export enum UserActionTypes {
   logoutUser = 'LOGOUT-USER',
   setIsLoading = 'SET-IS-USER-LOADING',
   setUserId = 'SET-USER-ID',
+  clearMyCollections = 'CLEAR-MY-COLLECTIONS',
 }
 
 const setUserPersonalInfoAction = (payload: UserPersonalInfoType) => ({
@@ -91,6 +91,10 @@ const setMyCollectionsAction = (collections: CollectionType[]) => ({
   collections,
 });
 
+export const clearMyCollectionsAction = () => ({
+  type: UserActionTypes.clearMyCollections,
+});
+
 const setEditCollectionsAction = (collections: CollectionType[]) => ({
   type: UserActionTypes.setEditCollections,
   collections,
@@ -103,11 +107,6 @@ const setDeleteCollectionsAction = (collections: CollectionType[]) => ({
 
 const updateEditCollectionsAction = (collectionId: number) => ({
   type: UserActionTypes.updateEditCollections,
-  collectionId,
-});
-
-const pullOutCollectionAction = (collectionId: number) => ({
-  type: UserActionTypes.pullOutCollectionAction,
   collectionId,
 });
 
@@ -201,6 +200,7 @@ export const getCollectionThemesThunk = () => (dispatch: AppDispatchType) => {
 export const getMyCollectionsThunk =
   (userId: number, page = 1) =>
   (dispatch: AppDispatchType) => {
+    dispatch(clearMyCollectionsAction());
     dispatch(setIsLoadingAction(true));
 
     requestAPI
@@ -267,18 +267,11 @@ export const updateCollectionThunk =
       .updateCollection(collection)
       .finally(() => dispatch(setIsLoadingAction(false)))
       .then((response) => {
-        logSuccess('The collection has been updated');
-        dispatch(updateCollectionAction(response));
+        if (response && typeof response === 'object' && 'id' in response) {
+          logSuccess('The collection has been updated');
+          dispatch(updateCollectionAction(response as CollectionType));
+        }
       });
-  };
-
-export const pullOutCollectionThunk =
-  (collectionId: number) => (dispatch: AppDispatchType) => {
-    requestAPI.pullOutCollection(collectionId).then((response) => {
-      if (response.code === 1) {
-        dispatch(pullOutCollectionAction(collectionId));
-      }
-    });
   };
 
 export const toggleLikeThunk =

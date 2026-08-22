@@ -30,6 +30,7 @@ function searchReducer(state = initState, action: AnyAction) {
         ...state,
         usersSearch: null,
         itemsSearch: null,
+        listSearch: null,
       };
     }
     case SearchActionTypes.setSearchList: {

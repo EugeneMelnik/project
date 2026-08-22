@@ -35,6 +35,25 @@ function adminReducer(state = initState, action: AnyAction) {
         isLoading: action.isLoading,
       };
     }
+    case AdminActionTypes.clearTargetData: {
+      return {
+        ...state,
+        targetUser: null,
+        targetCollections: {
+          collections: null,
+          countCollections: 0,
+        },
+      };
+    }
+    case AdminActionTypes.clearTargetCollections: {
+      return {
+        ...state,
+        targetCollections: {
+          collections: null,
+          countCollections: 0,
+        },
+      };
+    }
     case AdminActionTypes.setTargetCollections: {
       return {
         ...state,

@@ -1,6 +1,6 @@
 import { requestAPI } from '../../api/api';
 import type { AppDispatchType } from '../index';
-import { SearchUserType, ItemType } from '../../types';
+import { CollectionType, ItemType } from '../../types';
 
 export enum SearchActionTypes {
   setSearchUsers = 'SET-SEARCH-USERS',
@@ -8,12 +8,6 @@ export enum SearchActionTypes {
   clearSearchData = 'CLEAR-SEARCH-DATA',
   setSearchList = 'SET-SEARCH-LIST',
 }
-
-// another type!
-const setSearchUsersAction = (users: SearchUserType[]) => ({
-  type: SearchActionTypes.setSearchUsers,
-  users,
-});
 
 export const setSearchItemsAction = (items: ItemType[]) => ({
   type: SearchActionTypes.setSearchItems,
@@ -29,18 +23,25 @@ export const setSearchListAction = () => ({
 });
 
 export const searchThunk = (substr: string) => (dispatch: AppDispatchType) => {
+  dispatch(clearSearchDataAction());
   requestAPI.search(substr).then((response) => {
     if (
       !response ||
-      !Array.isArray(response.result) ||
-      response.result.length === 0
+      !Array.isArray(response.items) ||
+      !Array.isArray(response.collections)
     ) {
       return null;
     }
 
-    if (response.type === 'users') {
-      return dispatch(setSearchUsersAction(response.result));
-    }
-    return dispatch(setSearchItemsAction(response.result));
+    const results = [
+      ...response.items,
+      ...response.collections.map((collection: CollectionType) => ({
+        ...collection,
+        isCollection: true,
+      })),
+    ];
+
+    dispatch(setSearchItemsAction(results as ItemType[]));
+    return results;
   });
 };

@@ -1,16 +1,16 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import {
-  Badge,
-  Grid,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  styled,
+  Box,
+  Button,
+  Paper,
+  Typography,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import Sidebar from '../../components/Sidebar/Sidebar';
+import CollectionsBookmarkOutlinedIcon from '@mui/icons-material/CollectionsBookmarkOutlined';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import CollectionForm from '../../components/CollectionForm/CollectionForm';
 import Slider from '../../components/Slider/Slider';
 import { CollectionInitType, CollectionType, CollectionUpdateType } from '../../types';
@@ -18,14 +18,10 @@ import ModalEditCollection from '../../components/ModalEditCollection/ModalEditC
 import ModalDelete from '../../components/ModalDelete/ModalDelete';
 import { useLanguage } from '../../context/LanguageContext';
 
-const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
-  [theme.breakpoints.down('sm')]: {
-    backgroundColor: theme.palette.common.black,
-  },
-}));
-
 interface IUserPage {
   id: number;
+  name: string;
+  surname: string;
   collections: {
     collections: CollectionType[] | null;
     countCollections: number;
@@ -38,7 +34,6 @@ interface IUserPage {
   collectionsEdit: Array<CollectionType | null>;
   collectionsDel: Array<CollectionType | null>;
   updateCollection: (collection: CollectionUpdateType) => void;
-  pullOutCollection: (collectionId: number) => void;
   getMyCollections: (userId: number, page?: number) => void;
   getCollectionThemes: () => void;
   collectionThemes: { id: number; value: string }[] | null;
@@ -54,17 +49,34 @@ const UserPage: FC<IUserPage> = ({
   deleteCollection,
   collectionsDel,
   updateCollection,
-  pullOutCollection,
   getMyCollections,
   getCollectionThemes,
   collectionThemes,
   id,
+  name,
+  surname,
 }) => {
   const [openForm, setOpenForm] = useState<boolean>(false);
   const [openModalEdit, setOpenModalEdit] = useState<boolean>(false);
   const [openModalDelete, setOpenModalDelete] = useState<boolean>(false);
 
   const { language } = useLanguage();
+
+  useEffect(() => {
+    if (collectionsEdit.length) setOpenModalEdit(true);
+  }, [collectionsEdit]);
+
+  const collectionsCount = collections.countCollections;
+  const itemsCount = collections.collections?.reduce(
+    (total, collection) => total + (collection.list?.length || 0),
+    0,
+  ) || 0;
+
+  const openCollectionForm = () => {
+    if (!collectionThemes) getCollectionThemes();
+
+    setOpenForm(true);
+  };
 
   return (
     <>
@@ -80,130 +92,111 @@ const UserPage: FC<IUserPage> = ({
         setOpen={setOpenModalEdit}
         collectionsEdit={collectionsEdit}
         updateCollection={updateCollection}
-        pullOutCollection={pullOutCollection}
         collectionThemes={collectionThemes}
       />
       <ModalDelete
         openModal={openModalDelete}
         setOpen={setOpenModalDelete}
         collectionsDel={collectionsDel}
-        pullOutCollection={pullOutCollection}
         deleteCollection={deleteCollection}
       />
-      <Grid sx={{ height: '100%' }} container>
-        <Grid item lg={2.5} md={2.7} xs={12} sm={4}>
-          <Sidebar>
-            <StyledListItemButton
+      <Box sx={{ width: '100%', maxWidth: '1800px', mx: 'auto', px: { xs: 1, md: 3 }, py: 3 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 2,
+            flexWrap: 'wrap',
+            mb: 3,
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <PersonOutlineIcon color="secondary" sx={{ fontSize: 38 }} />
+            <Box>
+              <Typography variant="overline">{language.userPage.profile}</Typography>
+              <Typography variant="h3" sx={{ lineHeight: 1.1 }}>
+                {name} {surname}
+              </Typography>
+            </Box>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <Button variant="contained" startIcon={<AddIcon />} onClick={openCollectionForm}>
+              {language.userPage.createCollection}
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<EditIcon />}
+              disabled={collectionsEdit.length === 0}
               onClick={() => {
                 if (!collectionThemes) getCollectionThemes();
-
-                setOpenForm(true);
-              }}
-              sx={(theme) => ({
-                width: '100%',
-
-                [theme.breakpoints.down('sm')]: {
-                  justifyContent: 'center',
-                },
-
-                '& .MuiListItemIcon-root': {
-                  [theme.breakpoints.down('sm')]: {
-                    justifyContent: 'center',
-                  },
-                },
-                '& .MuiListItemText-root': {
-                  [theme.breakpoints.down('sm')]: {
-                    display: 'none',
-                  },
-                },
-              })}
-            >
-              <ListItemIcon>
-                <AddIcon color="secondary" />
-              </ListItemIcon>
-              <ListItemText primary={language.userPage.createCollection} />
-            </StyledListItemButton>
-            <StyledListItemButton
-              sx={(theme) => ({
-                width: '100%',
-
-                [theme.breakpoints.down('sm')]: {
-                  justifyContent: 'center',
-                },
-
-                '& .MuiListItemIcon-root': {
-                  [theme.breakpoints.down('sm')]: {
-                    justifyContent: 'center',
-                  },
-                },
-                '& .MuiListItemText-root': {
-                  [theme.breakpoints.down('sm')]: {
-                    display: 'none',
-                  },
-                },
-              })}
-              onClick={() => {
-                if (collectionsEdit.length === 0) return;
-                if (!collectionThemes) getCollectionThemes();
-
                 setOpenModalEdit(true);
               }}
             >
-              <ListItemIcon>
-                <Badge badgeContent={collectionsEdit.length} color="warning">
-                  <EditIcon color="secondary" />
-                </Badge>
-              </ListItemIcon>
-              <ListItemText primary={language.userPage.edit} />
-            </StyledListItemButton>
-            <StyledListItemButton
-              sx={(theme) => ({
-                width: '100%',
-
-                [theme.breakpoints.down('sm')]: {
-                  justifyContent: 'center',
-                },
-
-                '& .MuiListItemIcon-root': {
-                  [theme.breakpoints.down('sm')]: {
-                    justifyContent: 'center',
-                  },
-                },
-                '& .MuiListItemText-root': {
-                  [theme.breakpoints.down('sm')]: {
-                    display: 'none',
-                  },
-                },
-              })}
-              onClick={() => {
-                if (collectionsDel.length === 0) return;
-
-                setOpenModalDelete(true);
-              }}
+              {language.userPage.edit}
+              {' '}
+              ({collectionsEdit.length})
+            </Button>
+            <Button
+              color="error"
+              variant="outlined"
+              startIcon={<DeleteIcon />}
+              disabled={collectionsDel.length === 0}
+              onClick={() => setOpenModalDelete(true)}
             >
-              <ListItemIcon>
-                <Badge badgeContent={collectionsDel.length} color="error">
-                  <DeleteIcon color="secondary" />
-                </Badge>
-              </ListItemIcon>
-              <ListItemText primary={language.userPage.delete} />
-            </StyledListItemButton>
-          </Sidebar>
-        </Grid>
-        <Grid item lg={9.5} md={9.3} xs={12} sm={8}>
-          {!!collections.collections?.length && (
-            <Slider
-              type="private"
-              id={id}
-              setEditCollection={setEditCollection}
-              setDeleteCollection={setDeleteCollection}
-              collections={collections}
-              setCollection={setTargetCollection}
-              getUserCollections={getMyCollections}
-            />
-          )}
-        </Grid>
-      </Grid>
+              {language.userPage.delete}
+              {' '}
+              ({collectionsDel.length})
+            </Button>
+          </Box>
+        </Box>
+
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
+            gap: 1.5,
+            mb: 4,
+          }}
+        >
+          {[
+            { icon: CollectionsBookmarkOutlinedIcon, value: collectionsCount, label: language.userPage.collections },
+            { icon: Inventory2OutlinedIcon, value: itemsCount, label: language.userPage.items },
+            { icon: EditIcon, value: collectionsEdit.length, label: language.userPage.availableActions },
+          ].map(({ icon: Icon, value, label }) => (
+            <Paper key={label as string} variant="outlined" sx={{ p: 2, display: 'flex', gap: 1.5 }}>
+              <Icon color="secondary" />
+              <Box>
+                <Typography variant="h4">{value}</Typography>
+                <Typography variant="body2" color="text.secondary">{label}</Typography>
+              </Box>
+            </Paper>
+          ))}
+        </Box>
+
+        <Typography variant="h4" sx={{ mb: -2 }}>
+          {language.userPage.myCollections}
+        </Typography>
+        {!!collections.collections?.length ? (
+          <Slider
+            type="private"
+            id={id}
+            setEditCollection={setEditCollection}
+            setDeleteCollection={setDeleteCollection}
+            collections={collections}
+            setCollection={setTargetCollection}
+            getUserCollections={getMyCollections}
+          />
+        ) : (
+          <Paper variant="outlined" sx={{ mt: 3, p: { xs: 3, md: 5 }, textAlign: 'center' }}>
+            <CollectionsBookmarkOutlinedIcon color="secondary" sx={{ fontSize: 44, mb: 1 }} />
+            <Typography variant="h5">{language.userPage.noCollections}</Typography>
+            <Button variant="contained" startIcon={<AddIcon />} onClick={openCollectionForm} sx={{ mt: 2 }}>
+              {language.userPage.createCollection}
+            </Button>
+          </Paper>
+        )}
+      </Box>
     </>
   );
 };

@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Box } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import CollectionsIcon from '@mui/icons-material/Collections';
@@ -9,6 +9,7 @@ import { Button, Drawer, Link } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
+import MenuIcon from '@mui/icons-material/Menu';
 import RoutesApp from '../../constants/routes';
 import logout from '../../auth/services/logout';
 import { logError } from '../../services/logger';
@@ -49,12 +50,18 @@ interface IToolBar {
 }
 
 const ToolBar: FC<IToolBar> = ({ logOutUser, id, role }) => {
-  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(() => (
+    sessionStorage.getItem('rightNavigatorOpen') === 'true'
+  ));
 
   const classes = useStyles();
 
+  useEffect(() => {
+    sessionStorage.setItem('rightNavigatorOpen', String(isVisible));
+  }, [isVisible]);
+
   function toggleDrawer() {
-    setIsVisible(!isVisible);
+    setIsVisible((visible) => !visible);
   }
 
   async function handleLogout() {
@@ -70,14 +77,14 @@ const ToolBar: FC<IToolBar> = ({ logOutUser, id, role }) => {
   return (
     <Box>
       <ToggleButton onClick={toggleDrawer} variant="contained">
-        <CloseIcon fontSize="large" />
+        {isVisible ? <CloseIcon fontSize="large" /> : <MenuIcon fontSize="large" />}
       </ToggleButton>
       <Drawer
         className={classes.drawer}
         anchor="right"
         open={isVisible}
-        onClose={toggleDrawer}
-        variant="temporary"
+        onClose={() => setIsVisible(false)}
+        variant="persistent"
       >
         <div className={classes.toolbar} />
         <Link component={RouterLink} to={RoutesApp.Home}>

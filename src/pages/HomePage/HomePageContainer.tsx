@@ -33,6 +33,7 @@ interface IHomePageContainer {
   getAllTags: () => void;
   searchItemsByTag: (tag: string) => void;
   isLoading: boolean;
+  isAuth: boolean;
 }
 
 const HomePageContainer: FC<IHomePageContainer> = (props) => {
@@ -67,6 +68,7 @@ const mapStateToProps = (state: AppStateType) => ({
   likes: getLikesSelector(state),
   tags: getTagsSelector(state),
   isLoading: getIsLoading(state),
+  isAuth: state.auth.isAuth,
 });
 
 const mapDispatchToProps = (dispatch: AppDispatchType) => ({

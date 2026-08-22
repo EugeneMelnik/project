@@ -20,10 +20,20 @@ export const languages = {
       confirmPassword: 'Confirm password',
     },
     search: 'Search',
+    homePage: {
+      topCollections: 'Collections with the most liked items',
+      popularItems: 'Most liked items',
+    },
     userPage: {
-      createCollection: 'Create',
-      edit: 'Edit',
-      delete: 'Garbage',
+      profile: 'Profile',
+      myCollections: 'My collections',
+      collections: 'Collections',
+      items: 'Items',
+      availableActions: 'Collections to manage',
+      noCollections: 'Your collection shelf is empty',
+      createCollection: 'Create collection',
+      edit: 'Edit collections',
+      delete: 'Trash',
     },
     adminPage: {
       block: 'Block',
@@ -36,7 +46,7 @@ export const languages = {
       blocked: 'blocked',
     },
     collectionPage: {
-      createItem: 'Create',
+      createItem: 'Create item',
       edit: 'Edit',
       delete: 'Garbage',
       putDelete: 'Throw in the trash',
@@ -79,14 +89,12 @@ export const languages = {
       description: 'Description',
       variants: 'Variants',
       update: 'Update',
-      pullOut: 'Pull out',
       reset: 'Reset',
       created: 'Created',
     },
     modalEditItem: {
       title: 'Title',
       update: 'Update',
-      pullOut: 'Pull out',
       reset: 'Reset',
       enterBtn: 'Please press enter to add a new tag',
       tags: 'Tags',
@@ -94,7 +102,6 @@ export const languages = {
     },
     modalDelete: {
       delete: 'Delete',
-      pullOut: 'Pull out',
       created: 'Created',
     },
     itemPage: {
@@ -117,6 +124,10 @@ export const languages = {
       confirmPassword: 'Подтвердить пароль',
     },
     search: 'Поиск',
+    homePage: {
+      topCollections: 'Коллекции с самыми популярными элементами',
+      popularItems: 'Самые популярные элементы',
+    },
     adminPage: {
       block: 'Заблокировать',
       unblock: 'Разблокировать',
@@ -128,12 +139,18 @@ export const languages = {
       admin: 'администратор',
     },
     userPage: {
-      createCollection: 'Создать',
-      edit: 'Редактировать',
+      profile: 'Профиль',
+      myCollections: 'Мои коллекции',
+      collections: 'Коллекции',
+      items: 'Элементы',
+      availableActions: 'Коллекции в работе',
+      noCollections: 'Ваша полка коллекций пока пуста',
+      createCollection: 'Создать коллекцию',
+      edit: 'Редактировать коллекции',
       delete: 'Корзина',
     },
     collectionPage: {
-      createItem: 'Создать',
+      createItem: 'Создать элемент',
       edit: 'Редактировать',
       delete: 'Корзина',
       putDelete: 'Переместить в корзину',
@@ -177,14 +194,12 @@ export const languages = {
       description: 'Описание',
       variants: 'Варианты',
       update: 'Обновить',
-      pullOut: 'Восстановить',
       reset: 'Сбросить',
       created: 'Создано',
     },
     modalEditItem: {
       title: 'Название',
       update: 'Обновить',
-      pullOut: 'Восстановить',
       reset: 'Сбросить',
       enterBtn: 'Нажмите Enter, чтобы добавить новый тег',
       tags: 'Теги',
@@ -192,7 +207,6 @@ export const languages = {
     },
     modalDelete: {
       delete: 'Удалить',
-      pullOut: 'Восстановить',
       created: 'Создано',
     },
     itemPage: {

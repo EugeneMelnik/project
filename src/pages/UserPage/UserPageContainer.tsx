@@ -9,7 +9,6 @@ import {
   getDeleteCollectionsThunk,
   getEditCollectionsThunk,
   getMyCollectionsThunk,
-  pullOutCollectionThunk,
   setDeleteCollectionThunk,
   setEditCollectionThunk,
   updateCollectionThunk,
@@ -48,7 +47,6 @@ interface IUserPageContainer {
   collectionsEdit: Array<CollectionType | null>;
   collectionsDel: Array<CollectionType | null>;
   updateCollection: (collection: CollectionUpdateType) => void;
-  pullOutCollection: (collectionId: number) => void;
   getCollectionThemes: () => void;
   collectionThemes: { id: number; value: string }[] | null;
   isLoading: boolean;
@@ -116,9 +114,6 @@ const mapDispatchToProps = (dispatch: AppDispatchType) => ({
   },
   updateCollection: (collection: CollectionUpdateType) => {
     dispatch(updateCollectionThunk(collection));
-  },
-  pullOutCollection: (collectionId: number) => {
-    dispatch(pullOutCollectionThunk(collectionId));
   },
   getCollectionThemes: () => {
     dispatch(getCollectionThemesThunk());

@@ -85,7 +85,7 @@ const Header: FC<IHeader> = ({
     let count = 0;
 
     data.forEach((info) => {
-      count += info.comments.length;
+      count += info?.comments?.length || 0;
     });
 
     return count;
@@ -147,8 +147,9 @@ const Header: FC<IHeader> = ({
                         id="composition-menu"
                         aria-labelledby="composition-button"
                       >
-                        {untouchedComments.map((info) => (
+                        {untouchedComments.filter((info) => info?.comments?.length).map((info) => (
                           <MenuItem
+                            key={`${info.collectionId}-${info.itemId}`}
                             sx={{
                               display: 'flex',
                               justifyContent: 'space-between',

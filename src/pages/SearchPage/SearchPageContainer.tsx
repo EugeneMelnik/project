@@ -19,6 +19,7 @@ interface ISearchPageContainer {
   userId: number;
   listSearch:
   | ItemType[]
+  | (CollectionType & { isCollection: boolean })[]
   | {
     name: string;
     surname: string;
@@ -30,6 +31,7 @@ interface ISearchPageContainer {
   toogleLike: (userId: number, itemId: number) => void;
   likes: { itemId: number }[] | null;
   isLoading: boolean;
+  isAuth: boolean;
 }
 
 const SearchPageContainer: FC<ISearchPageContainer> = (props) => (
@@ -44,6 +46,7 @@ const mapStateToProps = (state: AppStateType) => ({
   userId: getUserId(state),
   likes: getLikesSelector(state),
   isLoading: getIsLoading(state),
+  isAuth: state.auth.isAuth,
 });
 
 const mapDispatchToProps = (dispatch: AppDispatchType) => ({

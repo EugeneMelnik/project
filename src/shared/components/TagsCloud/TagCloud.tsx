@@ -1,17 +1,12 @@
 import React, { FC } from 'react';
-import WordCloud from 'react-d3-cloud';
-import { Box, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { useNavigate } from 'react-router';
+import Cloud from 'react-d3-cloud';
 import RoutesApp from '../../../constants/routes';
 
 interface TagCloudTag {
   content: string;
   value?: number;
-}
-
-interface CloudWord {
-  text: string;
-  value: number;
 }
 
 interface ITagCloudComponent {
@@ -25,34 +20,43 @@ const TagCloudComponent: FC<ITagCloudComponent> = ({
 }) => {
   const navigate = useNavigate();
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   function handleSearchItemsByTag(tag: string) {
     searchItemsByTag(tag);
-
     navigate(RoutesApp.Search);
   }
 
-  const words = tags.map((tag) => ({
-    text: tag.content,
-    value: tag.value || 1,
-  }));
-
   return (
-    <Box sx={{ width: '100%', minHeight: 300, overflow: 'hidden' }}>
-      <WordCloud
-        data={words}
-        width={isSmallScreen ? 320 : 650}
-        height={isSmallScreen ? 260 : 300}
+    <Box
+      sx={{
+        minHeight: { xs: 320, md: 380 },
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        px: 2,
+      }}
+    >
+      <Typography variant="h3" sx={{ alignSelf: 'flex-start', mb: 1 }}>
+        Tags
+      </Typography>
+      <Cloud
+        data={tags.map((tag) => ({ text: tag.content, value: tag.value || 1 }))}
+        width={Math.max(280, Math.min(window.innerWidth - 32, 720))}
+        height={320}
         font="inherit"
-        fontWeight="600"
-        fontSize={(word: CloudWord) => Math.min(42, 16 + word.value * 2)}
-        rotate={(word: CloudWord) => (word.text.length > 8 ? 0 : (word.value % 2) * 12 - 6)}
-        padding={8}
-        fill={() => (theme.palette.mode === 'dark'
-          ? theme.palette.secondary.light
-          : theme.palette.primary.dark)}
-        onWordClick={(_event, word) => handleSearchItemsByTag(word.text)}
+        fontWeight="bold"
+        padding={4}
+        rotate={() => 0}
+        fontSize={(word) => Math.max(14, Math.min(42, word.value * 2 + 12))}
+        fill={(_word: { text: string; value: number }, index: number) => [
+          theme.palette.primary.main,
+          theme.palette.secondary.main,
+          theme.palette.warning.main,
+          theme.palette.error.main,
+        ][index % 4]}
+        onWordClick={(_, word) => handleSearchItemsByTag(word.text)}
       />
     </Box>
   );

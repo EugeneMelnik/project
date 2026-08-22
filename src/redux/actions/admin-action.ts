@@ -14,11 +14,21 @@ export enum AdminActionTypes {
   setUserIsNotAdmin = 'SET-USER-IS-NOT-ADMIN',
   clearAdminState = 'CLEAR-ADMIN-STATE',
   setIsLoading = 'SET-IS-ADMIN-LOADING',
+  clearTargetData = 'CLEAR-ADMIN-TARGET-DATA',
+  clearTargetCollections = 'CLEAR-ADMIN-TARGET-COLLECTIONS',
 }
 
 export const setIsLoadingAction = (isLoading: boolean) => ({
   type: AdminActionTypes.setIsLoading,
   isLoading,
+});
+
+export const clearTargetDataAction = () => ({
+  type: AdminActionTypes.clearTargetData,
+});
+
+export const clearTargetCollectionsAction = () => ({
+  type: AdminActionTypes.clearTargetCollections,
 });
 
 export const setTargetUser = (user: UserType) => ({
@@ -68,6 +78,7 @@ export const setTargetUserCollectons = (collections: unknown) => ({
 export const getTargetUserCollectionsThunk =
   (userId: number, page = 1) =>
   (dispatch: AppDispatchType) => {
+    dispatch(clearTargetCollectionsAction());
     requestAPI.getUserCollections(userId, page).then((response) => {
       dispatch(setTargetUserCollectons(response));
     });
@@ -75,6 +86,7 @@ export const getTargetUserCollectionsThunk =
 
 export const getTargetUserThunk =
   (userId: number) => (dispatch: AppDispatchType) => {
+    dispatch(clearTargetDataAction());
     dispatch(setIsLoadingAction(true));
 
     requestAPI

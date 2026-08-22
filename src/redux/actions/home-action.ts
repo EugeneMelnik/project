@@ -67,7 +67,9 @@ export const getAllTagsThunk = () => (dispatch: AppDispatchType) => {
 export const searchItemsByTagThunk =
   (tag: string) => (dispatch: AppDispatchType) => {
     requestAPI.searchItemsByTag(tag).then((response) => {
-      dispatch(setSearchItemsAction(response.items));
-      dispatch(setSearchListAction());
+      if (Array.isArray(response)) {
+        dispatch(setSearchItemsAction(response));
+        dispatch(setSearchListAction());
+      }
     });
   };

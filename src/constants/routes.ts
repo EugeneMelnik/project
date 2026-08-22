@@ -7,11 +7,11 @@ enum RoutesApp {
   User = '/profile',
   Collections = '/collections/*',
   CollectionsLink = '/collections/',
-  Collection = '/collection/:collectionId/*',
-  CollectionLink = '/collection/',
-  Item = '/item/:itemId',
+  Collection = '/collections/:collectionId/*',
+  CollectionLink = '/collections/',
+  Item = '/items/:itemId',
   TargetCollections = '/user/:userId',
-  ItemLink = '/item/',
+  ItemLink = '/items/',
   Search = '/search/',
 }
 

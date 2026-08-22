@@ -13,7 +13,8 @@ import {
   getTargetCollectionThunk,
   getTargetItemThunk,
   addCommentThunk,
-  pullOutItemThunk,
+  clearCollectionStateAction,
+  clearTargetItemAction,
   searchMatchTagsThunk,
   setCommentsTouchedThunk,
   setDeleteItemsThunk,
@@ -71,7 +72,6 @@ interface ICollectionPageContainer {
   setDeleteItems: (itemIds: number[]) => void;
   getEditItems: (collectionId: number) => void;
   getDeleteItems: (collectionId: number) => void;
-  pullOutItem: (itemId: number) => void;
   updateItem: (item: ItemUpdateType) => void;
   toogleLike: (userId: number, itemId: number) => void;
   likes: { itemId: number }[] | null;
@@ -80,6 +80,8 @@ interface ICollectionPageContainer {
   getAllComments: (itemId: number) => void;
   addComment: (content: string, userId: number, itemId: number) => void;
   setCommentsTouched: (itemId: number) => void;
+  clearCollectionState: () => void;
+  clearTargetItem: () => void;
 }
 
 const CollectionPageContainer: FC<ICollectionPageContainer> = (props) => {
@@ -87,23 +89,21 @@ const CollectionPageContainer: FC<ICollectionPageContainer> = (props) => {
 
   useEffect(() => {
     const {
-      id,
       getCollectionItems,
       getTargetCollection,
       getEditItems,
       getDeleteItems,
+      clearCollectionState,
     } = props;
 
     if (collectionId) {
-      if (!id) {
-        getTargetCollection(+collectionId);
-        getEditItems(+collectionId);
-        getDeleteItems(+collectionId);
-      }
-
+      clearCollectionState();
+      getTargetCollection(+collectionId);
+      getEditItems(+collectionId);
+      getDeleteItems(+collectionId);
       getCollectionItems(+collectionId);
     }
-  }, []);
+  }, [collectionId]);
 
   return (
     <>
@@ -115,6 +115,7 @@ const CollectionPageContainer: FC<ICollectionPageContainer> = (props) => {
           element={(
             <ItemPage
               getTargetItem={props.getTargetItem}
+              clearTargetItem={props.clearTargetItem}
               targetItem={props.targetItem as ItemType}
               toggleLike={props.toogleLike}
               userId={props.userId}
@@ -177,9 +178,6 @@ const mapDispatchToProps = (dispatch: AppDispatchType) => ({
   getDeleteItems: (collectionId: number) => {
     dispatch(getDeleteItemsThunk(collectionId));
   },
-  pullOutItem: (itemId: number) => {
-    dispatch(pullOutItemThunk(itemId));
-  },
   updateItem: (item: ItemUpdateType) => {
     dispatch(updateItemThunk(item));
   },
@@ -194,6 +192,12 @@ const mapDispatchToProps = (dispatch: AppDispatchType) => ({
   },
   setCommentsTouched: (itemId: number) => {
     dispatch(setCommentsTouchedThunk(itemId));
+  },
+  clearCollectionState: () => {
+    dispatch(clearCollectionStateAction());
+  },
+  clearTargetItem: () => {
+    dispatch(clearTargetItemAction());
   },
 });
 

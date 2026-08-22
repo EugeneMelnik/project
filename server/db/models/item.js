@@ -16,6 +16,11 @@ const Item = (sequelize) => {
       type: DataTypes.TEXT,
       allowNull: false,
     },
+    isDeleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   });
 
   Item.associate = function (models) {

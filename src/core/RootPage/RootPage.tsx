@@ -135,9 +135,10 @@ const RootPage: FC<IRootPage> = ({
         role={role}
         itemsSearch={itemsSearch?.map((item: any) => ({
           link: item.title,
-          routeId: item.collectionId,
+          routeId: item.isCollection ? item.id : item.collectionId,
           id: item.id,
-          icons: [item.icon],
+          icons: item.icon ? [item.icon] : [],
+          isCollection: !!item.isCollection,
         }))}
         usersSearch={usersSearch?.map((user: any) => ({
           link: `${user.name} ${user.surname}`,
@@ -146,7 +147,16 @@ const RootPage: FC<IRootPage> = ({
           icons: user.collections.map((collection: any) => collection.icon),
         }))}
       />
-      <Container sx={{ flex: 1, paddingTop: '3.2rem' }}>
+      <Container
+        maxWidth={false}
+        sx={{
+          flex: 1,
+          width: '100%',
+          maxWidth: '1800px',
+          paddingTop: '3.2rem',
+          px: { xs: 1, sm: 2, md: 3 },
+        }}
+      >
         <Outlet />
       </Container>
       <ToolBar logOutUser={logOutUser} id={id} role={role} />

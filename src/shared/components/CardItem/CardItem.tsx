@@ -34,19 +34,19 @@ interface ICardItem {
   item: ItemType;
   toogleLike: (userId: number, itemId: number) => void;
   userId: number;
+  isAuth: boolean;
   likes: { itemId: number }[] | null;
 }
 
 const CardItem: FC<ICardItem> = ({
-  item, toogleLike, userId, likes,
+  item, toogleLike, userId, isAuth, likes,
 }) => (
-  <StyledCard>
-    <Link
-      component={RouterLink}
-      to={`${RoutesApp.CollectionLink}${item.collectionId}${RoutesApp.ItemLink}${item.id}`}
-    >
-      Open
-    </Link>
+  <Link
+    component={RouterLink}
+    to={`${RoutesApp.CollectionLink}${item.collectionId}${RoutesApp.ItemLink}${item.id}`}
+    sx={{ display: 'block', textDecoration: 'none' }}
+  >
+    <StyledCard>
     {item.icon && (
       <CardMedia
         component="img"
@@ -68,17 +68,20 @@ const CardItem: FC<ICardItem> = ({
         </strong>
         likes
       </Typography>
-      <Checkbox
-        checked={!!likes?.find((like) => like.itemId === item.id)}
-        color="error"
-        icon={<FavoriteBorder color="error" />}
-        checkedIcon={<Favorite color="error" />}
-        onChange={() => {
-          if (userId && item.id) {
-            toogleLike(userId, item.id);
-          }
-        }}
-      />
+      {isAuth && item.collection?.user.id !== userId && (
+        <Checkbox
+          checked={!!likes?.find((like) => like.itemId === item.id)}
+          color="error"
+          icon={<FavoriteBorder color="error" />}
+          checkedIcon={<Favorite color="error" />}
+          onClick={(event) => event.stopPropagation()}
+          onChange={() => {
+            if (userId && item.id) {
+              toogleLike(userId, item.id);
+            }
+          }}
+        />
+      )}
     </Box>
     {item.collection && (
       <CardContent
@@ -121,7 +124,8 @@ const CardItem: FC<ICardItem> = ({
         label={tag.content}
       />
     ))}
-  </StyledCard>
+    </StyledCard>
+  </Link>
 );
 
 export default CardItem;

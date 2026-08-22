@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
   paper: {
     position: 'relative',
     width: '60%',
-    height: '150px',
+    maxHeight: '80vh',
 
     [theme.breakpoints.down('sm')]: {
       width: '100%',
@@ -69,9 +69,7 @@ interface IModalDelete {
   setOpen: (state: boolean) => void;
   collectionsDel?: Array<CollectionType | null>;
   itemsDel?: Array<ItemType | null>;
-  pullOutCollection?: (collectionId: number) => void;
   deleteCollection?: (collectionId: number) => void;
-  pullOutItem?: (itemId: number) => void;
   deleteItem?: (itemId: number) => void;
 }
 
@@ -80,9 +78,7 @@ const ModalDelete: FC<IModalDelete> = ({
   setOpen,
   collectionsDel,
   itemsDel,
-  pullOutCollection,
   deleteCollection,
-  pullOutItem,
   deleteItem,
 }) => {
   const classes = useStyles();
@@ -164,16 +160,6 @@ const ModalDelete: FC<IModalDelete> = ({
                 >
                   {language.modalDelete.delete}
                 </Button>
-                <Button
-                  sx={{
-                    flex: 1,
-                  }}
-                  onClick={() => {
-                    if (collection.id) pullOutCollection!(collection.id);
-                  }}
-                >
-                  {language.modalDelete.pullOut}
-                </Button>
               </Box>
             </ListItem>
             ),
@@ -225,16 +211,6 @@ const ModalDelete: FC<IModalDelete> = ({
                   color="warning"
                 >
                   {language.modalDelete.delete}
-                </Button>
-                <Button
-                  sx={{
-                    flex: 1,
-                  }}
-                  onClick={() => {
-                    if (item.id) pullOutItem!(item.id);
-                  }}
-                >
-                  {language.modalDelete.pullOut}
                 </Button>
               </Box>
             </ListItem>

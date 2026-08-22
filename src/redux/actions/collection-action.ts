@@ -15,6 +15,7 @@ const asItems = (response: unknown): ItemType[] =>
 
 export enum CollectionActionTypes {
   SetTargetItem = 'SET-TARGET-ITEM',
+  ClearTargetItem = 'CLEAR-TARGET-ITEM',
   DeleteItem = 'DELETE-ITEM',
   SetTargetCollection = 'SET-TARGET-COLLECTION',
   SetTargetCollectionItems = 'SET-TARGET-COLLECTION-ITEMS',
@@ -22,7 +23,6 @@ export enum CollectionActionTypes {
   SetEditListItems = 'SET-EDIT-LIST-ITEMS',
   UpdateDeleteListItems = 'UPDATE-DELETE-LIST-ITEMS',
   SetDeleteListItems = 'SET-DELETE-LIST-ITEMS',
-  PullOutItem = 'PULL-OUT-ITEM',
   AddNewItem = 'ADD-NEW-ITEM',
   AddMatchTags = 'ADD-MATCH-TAGS',
   UpdateListItems = 'UPDATE-LIST-ITEMS',
@@ -48,13 +48,12 @@ export const setTargetItemAction = (item: ItemType) => ({
   item,
 });
 
-export const deleteItemAction = (itemId: number) => ({
-  type: CollectionActionTypes.DeleteItem,
-  itemId,
+export const clearTargetItemAction = () => ({
+  type: CollectionActionTypes.ClearTargetItem,
 });
 
-export const pullOutItemAction = (itemId: number) => ({
-  type: CollectionActionTypes.PullOutItem,
+export const deleteItemAction = (itemId: number) => ({
+  type: CollectionActionTypes.DeleteItem,
   itemId,
 });
 
@@ -169,7 +168,6 @@ export const deleteItemThunk =
           logSuccess('The element collection is deleted.');
 
           dispatch(deleteItemAction(itemId));
-          dispatch(pullOutItemAction(itemId));
         }
       });
   };
@@ -210,15 +208,6 @@ export const getDeleteItemsThunk =
     });
   };
 
-export const pullOutItemThunk =
-  (itemId: number) => (dispatch: AppDispatchType) => {
-    requestAPI.pullOutItem(itemId).then((response) => {
-      if (response?.code === 1) {
-        dispatch(pullOutItemAction(itemId));
-      }
-    });
-  };
-
 export const updateItemThunk =
   (item: ItemUpdateType) => (dispatch: AppDispatchType) => {
     dispatch(setIsLoadingAction(true));
@@ -227,9 +216,10 @@ export const updateItemThunk =
       .updateItem(item)
       .finally(() => dispatch(setIsLoadingAction(false)))
       .then((response) => {
-        logSuccess('The element collection is updated.');
-
-        dispatch(updateNewItemAction(response));
+        if (response && typeof response === 'object' && 'id' in response) {
+          logSuccess('The element collection is updated.');
+          dispatch(updateNewItemAction(response as ItemType));
+        }
       });
   };
 
@@ -243,7 +233,9 @@ export const searchMatchTagsThunk =
 export const getAllCommentsThunk =
   (itemId: number) => (dispatch: AppDispatchType) => {
     requestAPI.getAllComments(itemId).then((response) => {
-      dispatch(setAllCommentsAction(response));
+      if (Array.isArray(response)) {
+        dispatch(setAllCommentsAction(response));
+      }
     });
   };
 
@@ -262,7 +254,9 @@ export const addCommentThunk =
 export const getUntouchedCommentsThunk =
   (userId: number) => (dispatch: AppDispatchType) => {
     requestAPI.getAllUntouchedComments(userId).then((response) => {
-      dispatch(setUntouchedCommentsAction(response));
+      if (Array.isArray(response)) {
+        dispatch(setUntouchedCommentsAction(response));
+      }
     });
   };
 

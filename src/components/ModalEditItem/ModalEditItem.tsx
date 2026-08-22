@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
     position: 'relative',
     width: '60%',
     minWidth: '300px',
-    height: '500px',
+    maxHeight: '80vh',
 
     [theme.breakpoints.down('sm')]: {
       width: '100%',
@@ -84,7 +84,6 @@ interface IModalEditItem {
   openModal: boolean;
   setOpen: (state: boolean) => void;
   itemsEdit: Array<ItemType | null>;
-  pullOutItem: (itemId: number) => void;
   updateItem: (item: ItemUpdateType) => void;
   customFields: CustomFieldType[] | null;
   searchMatchTags: (tag: string) => void;
@@ -95,7 +94,6 @@ const ModalEditItem: FC<IModalEditItem> = ({
   openModal,
   setOpen,
   itemsEdit,
-  pullOutItem,
   updateItem,
   customFields,
   searchMatchTags,
@@ -171,7 +169,6 @@ const ModalEditItem: FC<IModalEditItem> = ({
         },
       });
 
-      pullOutItem(itemId);
     },
   });
 
@@ -382,16 +379,6 @@ const ModalEditItem: FC<IModalEditItem> = ({
                       onClick={formik.handleReset}
                     >
                       {language.modalEditItem.reset}
-                    </Button>
-                    <Button
-                      sx={{
-                        flex: 1,
-                      }}
-                      onClick={() => {
-                        if (item.id) pullOutItem(item.id);
-                      }}
-                    >
-                      {language.modalEditItem.pullOut}
                     </Button>
                   </Box>
                 </ListItem>

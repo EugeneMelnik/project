@@ -6,7 +6,6 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { CollectionType } from '../../types';
 import CardCollection from '../../shared/components/CardCollection/CardCollection';
-import { logWarning } from '../../services/logger';
 
 interface ISlider {
   id: number;
@@ -23,8 +22,10 @@ interface ISlider {
 
 const useStyles = makeStyles((theme) => ({
   carousel: {
-    height: '16rem',
-    marginTop: '3.5rem',
+    height: '18rem',
+    marginTop: '1rem',
+    backgroundColor: 'rgba(31, 42, 47, 0.06)',
+    overflow: 'hidden',
 
     [theme.breakpoints.down('sm')]: {
       height: '20rem',
@@ -32,7 +33,6 @@ const useStyles = makeStyles((theme) => ({
 
     '& > :first-child': {
       height: '100% !important',
-      overflowX: 'auto',
 
       '& > :first-child': {
         height: '100% !important',
@@ -47,6 +47,23 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
+  navButton: {
+    width: '3.25rem',
+    height: '100%',
+    minHeight: '100%',
+    padding: 0,
+    borderRadius: 0,
+    color: theme.palette.primary.main,
+    transition: 'background-color 180ms ease',
+
+    '&:hover': {
+      backgroundColor: 'rgba(31, 42, 47, 0.14)',
+    },
+
+    '&.Mui-disabled': {
+      color: 'rgba(31, 42, 47, 0.2)',
+    },
+  },
   page: {
     display: 'flex',
     justifyContent: 'space-around',
@@ -55,14 +72,12 @@ const useStyles = makeStyles((theme) => ({
     padding: '3rem',
 
     [theme.breakpoints.down('sm')]: {
-      width: '900px',
+      width: '100%',
       paddingBottom: '2rem',
+      overflowX: 'auto',
     },
 
-    '& > *:hover': {
-      transform: 'scale(1.1)',
-      zIndex: 2,
-    },
+  
   },
 }));
 
@@ -76,61 +91,41 @@ const Slider: FC<ISlider> = ({
   setDeleteCollection,
 }) => {
   const [page, setPage] = useState(1);
-  const [btnDisable, setBtnDisable] = useState('');
 
   const PAGE_SIZE = 3;
 
   const classes = useStyles();
 
-  function checkLimit(
-    page: number,
-    pageSize: number,
-    countAllCollections: number,
-  ) {
-    return pageSize * page >= countAllCollections;
-  }
-
   function handleIncreasePage() {
-    if (checkLimit(page, PAGE_SIZE, collections.countCollections)) {
-      logWarning('No more collections.');
-      setBtnDisable('next');
-      return;
-    }
-    setBtnDisable('');
     setPage(page + 1);
     getUserCollections(id, page + 1);
   }
 
   function handleDecreasePage() {
-    if (page === 1) {
-      setBtnDisable('prev');
-      return;
-    }
-
-    setBtnDisable('');
     setPage(page - 1);
   }
 
   return (
     <Carousel
       autoPlay={false}
-      NextIcon={(
+      NavButton={({ onClick, next }) => (
         <IconButton
-          disabled={btnDisable === 'next'}
-          onClick={handleIncreasePage}
+          className={classes.navButton}
+          disabled={next
+            ? PAGE_SIZE * page >= collections.countCollections
+            : page === 1}
+          onClick={() => {
+            onClick();
+            if (next) {
+              handleIncreasePage();
+            } else {
+              handleDecreasePage();
+            }
+          }}
         >
-          <ChevronRightIcon htmlColor="white" />
+          {next ? <ChevronRightIcon /> : <ChevronLeftIcon />}
         </IconButton>
       )}
-      PrevIcon={(
-        <IconButton
-          onClick={handleDecreasePage}
-          disabled={btnDisable === 'prev'}
-        >
-          <ChevronLeftIcon htmlColor="white" />
-        </IconButton>
-      )}
-      sx={{ height: '100%' }}
       className={classes.carousel}
       navButtonsAlwaysVisible
     >

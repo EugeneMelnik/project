@@ -26,6 +26,7 @@ interface IInputSearch {
     id: number;
     routeId: number;
     icons: string[] | null;
+    isCollection?: boolean;
   }[]
   | undefined;
   usersSearch:
@@ -34,6 +35,7 @@ interface IInputSearch {
     id: number;
     routeId: number;
     icons: string[] | null;
+    isCollection?: boolean;
   }[]
   | undefined;
   clearSearchData: () => void;
@@ -90,6 +92,8 @@ const InputSearch: FC<IInputSearch> = ({
     }, delay);
   }
 
+  const options = itemsSearch || usersSearch || [];
+
   useEffect(() => {
     if (substr) {
       setIsLoading(true);
@@ -100,17 +104,7 @@ const InputSearch: FC<IInputSearch> = ({
   return (
     <Autocomplete
       popupIcon={null}
-      options={
-        itemsSearch
-        || usersSearch || [
-          {
-            link: '',
-            id: 0,
-            routeId: 0,
-            icons: [''],
-          },
-        ]
-      }
+      options={options}
       id="asynchronous-demo"
       sx={{ flex: 1 }}
       open={open}
@@ -123,59 +117,32 @@ const InputSearch: FC<IInputSearch> = ({
       }}
       className={classes.wrap}
       getOptionLabel={(option) => option.link}
-      renderOption={() => (itemsSearch
-        ? itemsSearch?.map(
-          (option) => !!option.id && (
-            <Box className={classes.link}>
-              {!!option.icons?.length && (
+      renderOption={(props, option) => (
+        <li {...props} key={`${option.routeId}-${option.id}`}>
+          <Box className={classes.link}>
+            {!!option.icons?.length && (
               <AvatarGroup max={4}>
-                {option.icons.map((icon) => (
+                {option.icons.map((icon, index) => (
                   <Avatar
-                    alt="Remy Sharp"
+                    key={`${option.id}-${index}`}
+                    alt={option.link}
                     src={`data:application/pdf;base64,${icon}`}
                   />
                 ))}
               </AvatarGroup>
-              )}
-              <Link
-                component={RouterLink}
-                      // eslint-disable-next-line max-len
-                to={`${RoutesApp.CollectionLink}${option.routeId}${RoutesApp.ItemLink}${option.id}`}
-                style={{
-                  display: 'block',
-                }}
-              >
-                {option.link}
-              </Link>
-            </Box>
-          ),
-        )
-        : usersSearch?.map(
-          (option) => !!option.id && (
-            <Box className={classes.link}>
-              {!!option.icons?.length && (
-              <AvatarGroup max={4}>
-                {option.icons.map((icon, idx: number) => (
-                  <Avatar
-                    id={String(idx)}
-                    alt="Remy Sharp"
-                    src={`data:application/pdf;base64,${icon}`}
-                  />
-                ))}
-              </AvatarGroup>
-              )}
-              <Link
-                component={RouterLink}
-                to={`${RoutesApp.CollectionsLink}user/${option.routeId}`}
-                style={{
-                  display: 'block',
-                }}
-              >
-                {option.link}
-              </Link>
-            </Box>
-          ),
-        ))}
+            )}
+            <Link
+              component={RouterLink}
+              to={itemsSearch && !option.isCollection
+                ? `${RoutesApp.CollectionLink}${option.routeId}${RoutesApp.ItemLink}${option.id}`
+                : `${RoutesApp.CollectionLink}${option.routeId}`}
+              style={{ display: 'block' }}
+            >
+              {option.link}
+            </Link>
+          </Box>
+        </li>
+      )}
       loading={loading}
       onBlur={() => {
         setOpen(false);

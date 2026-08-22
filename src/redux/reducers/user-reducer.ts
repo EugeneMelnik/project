@@ -80,6 +80,15 @@ function userReducer(state = initState, action: AnyAction) {
         },
       };
     }
+    case UserActionTypes.clearMyCollections: {
+      return {
+        ...state,
+        myCollections: {
+          countCollections: 0,
+          collections: null,
+        },
+      };
+    }
     case UserActionTypes.setMeIsNotAdmin: {
       return {
         ...state,
@@ -99,13 +108,15 @@ function userReducer(state = initState, action: AnyAction) {
           ...state.myCollections,
           collections: [
             ...state.myCollections.collections!.filter(
-              (collection) => collection.id !== action.collectionId,
+              (collection) => collection.id !== action.collectionId
             ),
           ],
         },
         listDeleteCollections: [
-          ...state.listDeleteCollections.filter(
-            (collection) => collection!.id !== action.collectionId,
+          ...state.listDeleteCollections.map((collection) =>
+            collection?.id === action.collectionId
+              ? { ...collection, isDeleted: true }
+              : collection
           ),
         ],
       };
@@ -118,7 +129,7 @@ function userReducer(state = initState, action: AnyAction) {
           collections: [
             action.collection,
             ...state.myCollections.collections!.filter(
-              (collection) => collection.id !== action.collection.id,
+              (collection) => collection.id !== action.collection.id
             ),
           ],
         },
@@ -147,24 +158,28 @@ function userReducer(state = initState, action: AnyAction) {
       };
     }
     case UserActionTypes.addNewCollection: {
+      const collection = action.data.collection || action.data;
+
       return {
         ...state,
         myCollections: {
           ...state.myCollections,
           collections: state.myCollections.collections
-            ? [action.data.collection, ...state.myCollections.collections]
-            : [action.data.collection],
-          countCollections: action.data.countCollections,
+            ? [collection, ...state.myCollections.collections]
+            : [collection],
+          countCollections:
+            action.data.countCollections ||
+            state.myCollections.countCollections + 1,
         },
       };
     }
     case UserActionTypes.updateEditCollections: {
       const [collection] = state.myCollections.collections!.filter(
-        (collection) => collection.id === action.collectionId,
+        (collection) => collection.id === action.collectionId
       );
 
       const [isExistCollection] = state.listEditCollections.filter(
-        (collection) => collection?.id === action.collectionId,
+        (collection) => collection?.id === action.collectionId
       );
       return {
         ...state,
@@ -172,28 +187,17 @@ function userReducer(state = initState, action: AnyAction) {
           ? [...state.listEditCollections, collection]
           : state.listEditCollections,
         listDeleteCollections: state.listDeleteCollections.filter(
-          (delCollection) => delCollection?.id !== collection.id,
-        ),
-      };
-    }
-    case UserActionTypes.pullOutCollectionAction: {
-      return {
-        ...state,
-        listEditCollections: state.listEditCollections.filter(
-          (collection) => collection?.id !== action.collectionId,
-        ),
-        listDeleteCollections: state.listDeleteCollections.filter(
-          (collection) => collection?.id !== action.collectionId,
+          (delCollection) => delCollection?.id !== collection.id
         ),
       };
     }
     case UserActionTypes.updateDeleteCollections: {
       const [collection] = state.myCollections.collections!.filter(
-        (collection) => collection.id === action.collectionId,
+        (collection) => collection.id === action.collectionId
       );
 
       const [isExistCollection] = state.listDeleteCollections.filter(
-        (collection) => collection?.id === action.collectionId,
+        (collection) => collection?.id === action.collectionId
       );
 
       return {
@@ -202,7 +206,7 @@ function userReducer(state = initState, action: AnyAction) {
           ? [...state.listDeleteCollections, collection]
           : state.listDeleteCollections,
         listEditCollections: state.listEditCollections.filter(
-          (editCollection) => editCollection?.id !== collection.id,
+          (editCollection) => editCollection?.id !== collection.id
         ),
       };
     }
