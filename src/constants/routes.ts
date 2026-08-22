@@ -3,7 +3,7 @@ enum RoutesApp {
   SignUp = '/signup',
   Admin = '/admin',
   Root = '/',
-  Home = '/home',
+  Home = '/',
   User = '/profile',
   Collections = '/collections/*',
   CollectionsLink = '/collections/',

@@ -10,7 +10,7 @@ import {
   getUserPersonalInfoThunk,
   toggleLikeThunk,
 } from './redux/actions/user-action';
-import { AppStateType } from './redux';
+import { AppDispatchType, AppStateType } from './redux';
 import { setIsAuthAction } from './redux/actions/auth-action';
 import Toastify from './components/Toastify/Toastify';
 import AppRoutes from './routes';
@@ -74,7 +74,7 @@ const mapStateToProps = (state: AppStateType) => ({
   isAuth: state.auth.isAuth,
 });
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: AppDispatchType) => ({
   getUserPersonalInfo: (payload: CredentialsType) => dispatch(getUserPersonalInfoThunk(payload)),
   toggleLike: (userId: number, itemId: number) => dispatch(toggleLikeThunk(userId, itemId)),
   setIsAuth: (isAuth: boolean) => dispatch(setIsAuthAction(isAuth)),

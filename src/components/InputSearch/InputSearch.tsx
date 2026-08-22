@@ -155,9 +155,9 @@ const InputSearch: FC<IInputSearch> = ({
             <Box className={classes.link}>
               {!!option.icons?.length && (
               <AvatarGroup max={4}>
-                {option.icons.map((icon, idx: any) => (
+                {option.icons.map((icon, idx: number) => (
                   <Avatar
-                    id={idx}
+                    id={String(idx)}
                     alt="Remy Sharp"
                     src={`data:application/pdf;base64,${icon}`}
                   />
@@ -185,7 +185,7 @@ const InputSearch: FC<IInputSearch> = ({
         <StyledTextField
           {...params}
           placeholder={language.search}
-          onChange={(e: any) => {
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setOpen(true);
             setSubstr(e.target.value);
           }}

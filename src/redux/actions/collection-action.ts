@@ -5,7 +5,13 @@ import {
   CommentType,
   ItemInitType,
   ItemType,
+  ItemUpdateType,
+  MatchTagType,
 } from '../../types';
+import type { AppDispatchType } from '../index';
+
+const asItems = (response: unknown): ItemType[] =>
+  Array.isArray(response) ? (response as ItemType[]) : [];
 
 export enum CollectionActionTypes {
   SetTargetItem = 'SET-TARGET-ITEM',
@@ -67,7 +73,7 @@ export const updateNewItemAction = (item: ItemType) => ({
   item,
 });
 
-export const addMatchTagsAction = (tags: any) => ({
+export const addMatchTagsAction = (tags: MatchTagType[]) => ({
   type: CollectionActionTypes.AddMatchTags,
   tags,
 });
@@ -112,144 +118,160 @@ export const setCommentsTouchedAction = (itemId: number) => ({
   itemId,
 });
 
-export const getCollectionItemsThunk = (collectionId: number) => (dispatch: any) => {
-  dispatch(setIsLoadingAction(true));
+export const getCollectionItemsThunk =
+  (collectionId: number) => (dispatch: AppDispatchType) => {
+    dispatch(setIsLoadingAction(true));
 
-  requestAPI
-    .getCollectionItems(collectionId)
-    .finally(() => dispatch(setIsLoadingAction(false)))
-    .then((response) => {
-      dispatch(setTargetCollectionItemsAction(response as ItemType[]));
+    requestAPI
+      .getCollectionItems(collectionId)
+      .finally(() => dispatch(setIsLoadingAction(false)))
+      .then((response) => {
+        dispatch(setTargetCollectionItemsAction(asItems(response)));
+      });
+  };
+
+export const getTargetCollectionThunk =
+  (collectionId: number) => (dispatch: AppDispatchType) => {
+    requestAPI.getCollection(collectionId).then((response) => {
+      dispatch(setTargetCollectionAction(response as CollectionType));
     });
-};
+  };
 
-export const getTargetCollectionThunk = (collectionId: number) => (dispatch: any) => {
-  requestAPI.getCollection(collectionId).then((response) => {
-    dispatch(setTargetCollectionAction(response as CollectionType));
-  });
-};
-
-export const getTargetItemThunk = (itemId: number, collectionId: number) => (dispatch: any) => {
-  requestAPI.getItem(itemId, collectionId).then((response) => {
-    dispatch(setTargetItemAction(response as ItemType));
-  });
-};
-
-export const createNewItemThunk = (itemInfo: ItemInitType) => (dispatch: any) => {
-  dispatch(setIsLoadingAction(true));
-
-  requestAPI
-    .createItem(itemInfo)
-    .finally(() => dispatch(setIsLoadingAction(false)))
-    .then((response) => {
-      dispatch(addNewItemAction(response));
-      logSuccess('The element has been created.');
+export const getTargetItemThunk =
+  (itemId: number, collectionId: number) => (dispatch: AppDispatchType) => {
+    requestAPI.getItem(itemId, collectionId).then((response) => {
+      dispatch(setTargetItemAction(response as ItemType));
     });
-};
+  };
 
-export const deleteItemThunk = (itemId: number) => (dispatch: any) => {
-  dispatch(setIsLoadingAction(true));
+export const createNewItemThunk =
+  (itemInfo: ItemInitType) => (dispatch: AppDispatchType) => {
+    dispatch(setIsLoadingAction(true));
 
-  requestAPI
-    .deleteItem(itemId)
-    .finally(() => dispatch(setIsLoadingAction(false)))
-    .then((response) => {
-      if (response.code === 1) {
-        logSuccess('The element collection is deleted.');
+    requestAPI
+      .createItem(itemInfo)
+      .finally(() => dispatch(setIsLoadingAction(false)))
+      .then((response) => {
+        dispatch(addNewItemAction(response));
+        logSuccess('The element has been created.');
+      });
+  };
 
-        dispatch(deleteItemAction(itemId));
+export const deleteItemThunk =
+  (itemId: number) => (dispatch: AppDispatchType) => {
+    dispatch(setIsLoadingAction(true));
+
+    requestAPI
+      .deleteItem(itemId)
+      .finally(() => dispatch(setIsLoadingAction(false)))
+      .then((response) => {
+        if (response.code === 1) {
+          logSuccess('The element collection is deleted.');
+
+          dispatch(deleteItemAction(itemId));
+          dispatch(pullOutItemAction(itemId));
+        }
+      });
+  };
+
+export const setEditItemsThunk =
+  (itemIds: number[]) => (dispatch: AppDispatchType) => {
+    dispatch(setIsLoadingAction(true));
+
+    requestAPI
+      .setEditItems(itemIds)
+      .finally(() => dispatch(setIsLoadingAction(false)))
+      .then(() => {
+        dispatch(updateEditListItemsAction(itemIds));
+      });
+  };
+
+export const setDeleteItemsThunk =
+  (itemIds: number[]) => (dispatch: AppDispatchType) => {
+    dispatch(setIsLoadingAction(true));
+
+    requestAPI
+      .setDeleteItems(itemIds)
+      .finally(() => dispatch(setIsLoadingAction(false)))
+      .then(() => dispatch(updateDeleteListItemsAction(itemIds)));
+  };
+
+export const getEditItemsThunk =
+  (collectionId: number) => (dispatch: AppDispatchType) => {
+    requestAPI.getEditItems(collectionId).then((response) => {
+      dispatch(setEditListItemsAction(asItems(response)));
+    });
+  };
+
+export const getDeleteItemsThunk =
+  (collectionId: number) => (dispatch: AppDispatchType) => {
+    requestAPI.getDeleteItems(collectionId).then((response) => {
+      dispatch(setDeleteListItemsAction(asItems(response)));
+    });
+  };
+
+export const pullOutItemThunk =
+  (itemId: number) => (dispatch: AppDispatchType) => {
+    requestAPI.pullOutItem(itemId).then((response) => {
+      if (response?.code === 1) {
         dispatch(pullOutItemAction(itemId));
       }
     });
-};
+  };
 
-export const setEditItemsThunk = (itemIds: number[]) => (dispatch: any) => {
-  dispatch(setIsLoadingAction(true));
+export const updateItemThunk =
+  (item: ItemUpdateType) => (dispatch: AppDispatchType) => {
+    dispatch(setIsLoadingAction(true));
 
-  requestAPI
-    .setEditItems(itemIds)
-    .finally(() => dispatch(setIsLoadingAction(false)))
-    .then(() => {
-      dispatch(updateEditListItemsAction(itemIds));
+    requestAPI
+      .updateItem(item)
+      .finally(() => dispatch(setIsLoadingAction(false)))
+      .then((response) => {
+        logSuccess('The element collection is updated.');
+
+        dispatch(updateNewItemAction(response));
+      });
+  };
+
+export const searchMatchTagsThunk =
+  (tag: string) => (dispatch: AppDispatchType) => {
+    requestAPI
+      .searchMatchTag(tag)
+      .then((response) => dispatch(addMatchTagsAction(response)));
+  };
+
+export const getAllCommentsThunk =
+  (itemId: number) => (dispatch: AppDispatchType) => {
+    requestAPI.getAllComments(itemId).then((response) => {
+      dispatch(setAllCommentsAction(response));
     });
-};
+  };
 
-export const setDeleteItemsThunk = (itemIds: number[]) => (dispatch: any) => {
-  dispatch(setIsLoadingAction(true));
+export const addCommentThunk =
+  (str: string, id: number, itemId: number) => (dispatch: AppDispatchType) => {
+    dispatch(setIsLoadingAction(true));
 
-  requestAPI
-    .setDeleteItems(itemIds)
-    .finally(() => dispatch(setIsLoadingAction(false)))
-    .then(() => dispatch(updateDeleteListItemsAction(itemIds)));
-};
+    requestAPI
+      .addComment(str, id, itemId)
+      .finally(() => dispatch(setIsLoadingAction(false)))
+      .then(() => {
+        dispatch(getAllCommentsThunk(itemId));
+      });
+  };
 
-export const getEditItemsThunk = (collectionId: number) => (dispatch: any) => {
-  requestAPI.getEditItems(collectionId).then((response) => {
-    dispatch(setEditListItemsAction(response as ItemType[]));
-  });
-};
-
-export const getDeleteItemsThunk = (collectionId: number) => (dispatch: any) => {
-  requestAPI.getDeleteItems(collectionId).then((response) => {
-    dispatch(setDeleteListItemsAction(response as ItemType[]));
-  });
-};
-
-export const pullOutItemThunk = (itemId: number) => (dispatch: any) => {
-  requestAPI.pullOutItem(itemId).then((response) => {
-    if (response.code === 1) {
-      dispatch(pullOutItemAction(itemId));
-    }
-  });
-};
-
-export const updateItemThunk = (item: any) => (dispatch: any) => {
-  dispatch(setIsLoadingAction(true));
-
-  requestAPI
-    .updateItem(item)
-    .finally(() => dispatch(setIsLoadingAction(false)))
-    .then((response) => {
-      logSuccess('The element collection is updated.');
-
-      dispatch(updateNewItemAction(response));
+export const getUntouchedCommentsThunk =
+  (userId: number) => (dispatch: AppDispatchType) => {
+    requestAPI.getAllUntouchedComments(userId).then((response) => {
+      dispatch(setUntouchedCommentsAction(response));
     });
-};
+  };
 
-export const searchMatchTagsThunk = (tag: string) => (dispatch: any) => {
-  requestAPI
-    .searchMatchTag(tag)
-    .then((response) => dispatch(addMatchTagsAction(response)));
-};
-
-export const getAllCommentsThunk = (itemId: number) => (dispatch: any) => {
-  requestAPI.getAllComments(itemId).then((response) => {
-    dispatch(setAllCommentsAction(response));
-  });
-};
-
-export const addCommentThunk = (str: string, id: number, itemId: number) => (dispatch: any) => {
-  dispatch(setIsLoadingAction(true));
-
-  requestAPI
-    .addComment(str, id, itemId)
-    .finally(() => dispatch(setIsLoadingAction(false)))
-    .then(() => {
-      dispatch(getAllCommentsThunk(itemId));
+export const setCommentsTouchedThunk =
+  (itemId: number) => (dispatch: AppDispatchType) => {
+    requestAPI.setCommentsTouched(itemId).then((response) => {
+      dispatch(setCommentsTouchedAction(response));
     });
-};
-
-export const getUntouchedCommentsThunk = (userId: number) => (dispatch: any) => {
-  requestAPI.getAllUntouchedComments(userId).then((response) => {
-    dispatch(setUntouchedCommentsAction(response));
-  });
-};
-
-export const setCommentsTouchedThunk = (itemId: number) => (dispatch: any) => {
-  requestAPI.setCommentsTouched(itemId).then((response) => {
-    dispatch(setCommentsTouchedAction(response));
-  });
-};
+  };
 
 // table filters
 const updateListItemsAction = (items: ItemType[]) => ({
@@ -257,50 +279,58 @@ const updateListItemsAction = (items: ItemType[]) => ({
   items,
 });
 
-export const filterContainsThunk = (id: number, column: string, str: string) => (dispatch: any) => {
-  requestAPI.filterContains(id, column, str).then((response) => {
-    dispatch(updateListItemsAction(response));
-  });
-};
+export const filterContainsThunk =
+  (id: number, column: string, str: string) => (dispatch: AppDispatchType) => {
+    requestAPI.filterContains(id, column, str).then((response) => {
+      dispatch(updateListItemsAction(asItems(response)));
+    });
+  };
 
-export const filterStartsWithThunk = (id: number, col: string, str: string) => (dispatch: any) => {
-  requestAPI.filterStartsWithThunk(id, col, str).then((response) => {
-    dispatch(updateListItemsAction(response));
-  });
-};
+export const filterStartsWithThunk =
+  (id: number, col: string, str: string) => (dispatch: AppDispatchType) => {
+    requestAPI.filterStartsWithThunk(id, col, str).then((response) => {
+      dispatch(updateListItemsAction(asItems(response)));
+    });
+  };
 
-export const filterEqualsThunk = (id: number, column: string, str: string) => (dispatch: any) => {
-  requestAPI.filterEqualsThunk(id, column, str).then((response) => {
-    dispatch(updateListItemsAction(response));
-  });
-};
+export const filterEqualsThunk =
+  (id: number, column: string, str: string) => (dispatch: AppDispatchType) => {
+    requestAPI.filterEqualsThunk(id, column, str).then((response) => {
+      dispatch(updateListItemsAction(asItems(response)));
+    });
+  };
 
-export const filterIsEmptyThunk = (collectionId: number, column: string) => (dispatch: any) => {
-  requestAPI.filterIsEmpty(collectionId, column).then((response) => {
-    dispatch(updateListItemsAction(response));
-  });
-};
+export const filterIsEmptyThunk =
+  (collectionId: number, column: string) => (dispatch: AppDispatchType) => {
+    requestAPI.filterIsEmpty(collectionId, column).then((response) => {
+      dispatch(updateListItemsAction(asItems(response)));
+    });
+  };
 
-export const filterIsNotEmptyThunk = (collectionId: number, column: string) => (dispatch: any) => {
-  requestAPI.filterIsNotEmpty(collectionId, column).then((response) => {
-    dispatch(updateListItemsAction(response));
-  });
-};
+export const filterIsNotEmptyThunk =
+  (collectionId: number, column: string) => (dispatch: AppDispatchType) => {
+    requestAPI.filterIsNotEmpty(collectionId, column).then((response) => {
+      dispatch(updateListItemsAction(asItems(response)));
+    });
+  };
 
-export const filterExistTagThunk = (collectionId: number, str: string) => (dispatch: any) => {
-  requestAPI.filterExistTag(collectionId, str).then((response) => {
-    dispatch(updateListItemsAction(response));
-  });
-};
+export const filterExistTagThunk =
+  (collectionId: number, str: string) => (dispatch: AppDispatchType) => {
+    requestAPI.filterExistTag(collectionId, str).then((response) => {
+      dispatch(updateListItemsAction(asItems(response)));
+    });
+  };
 
-export const filterMoreThanThunk = (id: number, column: string, str: string) => (dispatch: any) => {
-  requestAPI.filterMoreThan(id, column, str).then((response) => {
-    dispatch(updateListItemsAction(response));
-  });
-};
+export const filterMoreThanThunk =
+  (id: number, column: string, str: string) => (dispatch: AppDispatchType) => {
+    requestAPI.filterMoreThan(id, column, str).then((response) => {
+      dispatch(updateListItemsAction(asItems(response)));
+    });
+  };
 
-export const filterLessThanThunk = (id: number, column: string, str: string) => (dispatch: any) => {
-  requestAPI.filterLessThan(id, column, str).then((response) => {
-    dispatch(updateListItemsAction(response));
-  });
-};
+export const filterLessThanThunk =
+  (id: number, column: string, str: string) => (dispatch: AppDispatchType) => {
+    requestAPI.filterLessThan(id, column, str).then((response) => {
+      dispatch(updateListItemsAction(asItems(response)));
+    });
+  };

@@ -62,8 +62,8 @@ const ToolBar: FC<IToolBar> = ({ logOutUser, id, role }) => {
       await logout();
 
       logOutUser(id);
-    } catch (error: any) {
-      logError(error.message);
+    } catch (error: unknown) {
+      logError(error instanceof Error ? error.message : String(error));
     }
   }
 

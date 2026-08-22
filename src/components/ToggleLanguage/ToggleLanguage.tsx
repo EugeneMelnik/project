@@ -45,7 +45,7 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   },
 }));
 
-const ToggleLanguage: FC<any> = () => {
+const ToggleLanguage: FC = () => {
   const { setLanguage, language } = useLanguage();
 
   return (
@@ -62,13 +62,13 @@ const ToggleLanguage: FC<any> = () => {
             sx={{ m: 1 }}
             onChange={() => {
               if (language.mode === 'eng') {
-                setLanguage('by');
+                setLanguage('rus');
                 return;
               }
 
               setLanguage('eng');
             }}
-            checked={language.mode === 'by'}
+            checked={language.mode === 'rus'}
           />
             )}
         label={language.mode}

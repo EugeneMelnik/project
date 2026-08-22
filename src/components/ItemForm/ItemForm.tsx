@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import CustomField from '../CustomField/CustomField';
 import InputFile from '../../shared/components/InputFile/InputFile';
+import { CustomFieldType, IconValue, ItemInitType, MatchTagType } from '../../types';
 
 const StyledButton = styled(Button)(({ theme }) => ({
   position: 'absolute',
@@ -39,7 +40,6 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     rowGap: '1.4rem',
     padding: '1.4rem',
-    height: '300px',
     overflowY: 'scroll',
 
     [theme.breakpoints.down('sm')]: {
@@ -63,10 +63,10 @@ interface IItemForm {
   collectionId: number;
   openForm: boolean;
   setOpenForm: (state: boolean) => void;
-  customFields: string[];
-  createNewItem: (itemInfo: any) => void;
+  customFields: CustomFieldType[];
+  createNewItem: (itemInfo: ItemInitType) => void;
   searchMatchTags: (tag: string) => void;
-  matchTags: any;
+  matchTags: MatchTagType[] | null;
 }
 
 const ItemForm: FC<IItemForm> = ({
@@ -79,15 +79,15 @@ const ItemForm: FC<IItemForm> = ({
   matchTags,
 }) => {
   const [tags, setTags] = useState<string[]>([]);
-  const [image, setImage] = useState<any>();
+  const [image, setImage] = useState<IconValue>();
   const [isSubmited, setIsSubmited] = useState(false);
 
   const classes = useStyles();
 
-  function getInitFields(customFields: string[]) {
+  function getInitFields(fields: CustomFieldType[]) {
     let obj = {};
 
-    customFields.forEach((customField: any) => {
+    fields.forEach((customField) => {
       const [key] = Object.keys(customField);
       obj = {
         ...obj,
@@ -115,13 +115,13 @@ const ItemForm: FC<IItemForm> = ({
     setTags(tags.filter((tag) => tag !== str));
   };
 
-  function handleSetTag(formik: any) {
+  function handleSetTag(formik: { values: { tags: string } }) {
     if (formik.values.tags.trim()) {
       searchMatchTags(formik.values.tags);
     }
   }
 
-  function handlePushTag(formik: any) {
+  function handlePushTag(formik: { values: { tags: string } }) {
     if (!formik.values.tags.trim()) return;
 
     setIsSubmited(false);
@@ -191,7 +191,7 @@ const ItemForm: FC<IItemForm> = ({
         <FormikProvider value={formik}>
           <form
             className={classes.form}
-            onSubmit={(e: any) => {
+            onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
               setIsSubmited(true);
 
               return formik.handleSubmit(e);
@@ -218,7 +218,7 @@ const ItemForm: FC<IItemForm> = ({
                 onKeyDown={() => {
                   handleSetTag(formik);
                 }}
-                onChange={(e: any) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   setIsSubmited(false);
 
                   formik.handleChange(e);
@@ -244,7 +244,7 @@ const ItemForm: FC<IItemForm> = ({
               )}
             </Box>
             <Box>
-              {matchTags?.map((matchTag: { content: string }, idx: any) => (
+              {matchTags?.map((matchTag, idx: number) => (
                 <Chip
                   key={idx}
                   label={matchTag.content}
@@ -260,7 +260,7 @@ const ItemForm: FC<IItemForm> = ({
               ))}
             </Box>
             {customFields
-              && customFields.map((field: any, index: any) => (
+              && customFields.map((field, index: number) => (
                 <CustomField
                   typeField="create"
                   key={index}

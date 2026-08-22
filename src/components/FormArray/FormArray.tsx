@@ -3,6 +3,7 @@ import {
   Box, Button, TextField, Typography,
 } from '@mui/material';
 import { FieldArray } from 'formik';
+import { FormikHandlers } from 'formik';
 import React, { FC } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -24,12 +25,15 @@ const useStyles = makeStyles({
   },
 });
 
-interface IFormArray {
-  formik: any;
+interface IFormArray<T extends Record<'numbers' | 'texts' | 'multiLines' | 'dates' | 'radioFields', string[]>> {
+  formik: {
+    values: T;
+    handleChange: FormikHandlers['handleChange'];
+  };
   type: 'numbers' | 'texts' | 'multiLines' | 'dates' | 'radioFields';
 }
 
-const FormArray: FC<IFormArray> = ({ formik, type }) => {
+const FormArray = <T extends Record<'numbers' | 'texts' | 'multiLines' | 'dates' | 'radioFields', string[]>>({ formik, type }: IFormArray<T>) => {
   const classes = useStyles();
 
   const { language } = useLanguage();
@@ -56,7 +60,7 @@ const FormArray: FC<IFormArray> = ({ formik, type }) => {
                 {language.modalCreateCollection.addField}
               </Button>
             </Box>
-            {values[`${type}`].map((number: string, idx: any) => (
+            {values[`${type}`].map((number: string, idx: number) => (
               // eslint-disable-next-line react/no-array-index-key
               <Box className={classes.input} key={idx}>
                 <Button

@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, FormEvent, useEffect, useState } from 'react';
 import {
   Avatar,
   Box,
@@ -13,7 +13,7 @@ import { useParams } from 'react-router';
 import moment from 'moment';
 import { Favorite, FavoriteBorder } from '@mui/icons-material';
 import TagIcon from '@mui/icons-material/Tag';
-import { ItemType } from '../../types';
+import { CustomFieldType, ItemType } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
 
 interface IItemPage {
@@ -25,7 +25,7 @@ interface IItemPage {
   getAllComments: (itemId: number) => void;
   addComment: (content: string, userId: number, itemId: number) => void;
   setCommentsTouched: (itemId: number) => void;
-  customFields: string[];
+  customFields: CustomFieldType[] | null;
 }
 
 const ItemPage: FC<IItemPage> = ({
@@ -53,7 +53,7 @@ const ItemPage: FC<IItemPage> = ({
     }
   }, []);
 
-  function handleSubmit(e: any) {
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (value.trim()) {
@@ -62,9 +62,9 @@ const ItemPage: FC<IItemPage> = ({
     }
   }
 
-  function getCollectionInfo(allFields: any) {
-    const collectionInfo: any = [];
-    allFields.forEach((obj: { [key: string]: string }) => {
+  function getCollectionInfo(allFields: CustomFieldType[]) {
+    const collectionInfo: Record<string, string>[] = [];
+    allFields.forEach((obj) => {
       const [key] = Object.keys(obj);
 
       const newKey = key.replace(/Key/, 'Value');
@@ -102,11 +102,11 @@ const ItemPage: FC<IItemPage> = ({
             {moment(targetItem.createdAt).format('DD/MM/YYYY')}
           </Typography>
           <Avatar
-            src={`data:application/pdf;base64,${targetItem.icon}`}
+            src={`data:application/pdf;base64,${String(targetItem.icon || '')}`}
             sx={{ width: '10rem', height: '10rem' }}
           />
           <Box>
-            {targetItem.tags?.map((tag, idx: any) => (
+            {targetItem.tags?.map((tag, idx: number) => (
               <Chip
                 icon={<TagIcon />}
                 variant="outlined"
@@ -139,7 +139,7 @@ const ItemPage: FC<IItemPage> = ({
                       {obj[key].split(':')[0] || obj[key]}
                     </Typography>
                     <Typography variant="body1">
-                      {targetItem[key as keyof ItemType]}
+                      {String(targetItem[key as keyof ItemType] || '')}
                     </Typography>
                   </Box>
                   )
@@ -162,7 +162,7 @@ const ItemPage: FC<IItemPage> = ({
                 placeholder={language.itemPage.addComment}
                 required
                 value={value}
-                onChange={(e: any) => setValue(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setValue(e.target.value)}
               />
               <Button type="submit">{language.itemPage.addComment}</Button>
             </Box>

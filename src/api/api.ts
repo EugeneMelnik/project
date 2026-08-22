@@ -1,4 +1,11 @@
 import axios from 'axios';
+import {
+  CollectionInitType,
+  CollectionUpdateType,
+  ItemInitType,
+  ItemType,
+  ItemUpdateType,
+} from '../types';
 import type { CredentialsType } from '../redux/actions/user-action';
 import { logError } from '../services/logger';
 
@@ -372,7 +379,7 @@ export const requestAPI = {
       .then((response) => response.data)
       .catch((error) => logError(error.message));
   },
-  createCollection(collectionInfo: any) {
+  createCollection(collectionInfo: CollectionInitType) {
     const formData = new FormData();
 
     // need to find another way
@@ -381,7 +388,8 @@ export const requestAPI = {
         formData.append(key, JSON.stringify(collectionInfo[key]));
         return;
       }
-      formData.append(key, collectionInfo[key]);
+      const value = collectionInfo[key as keyof CollectionInitType];
+      formData.append(key, value instanceof File ? value : String(value));
     });
     return axios
       .post(baseURL + API.CreateCollection, formData, {
@@ -392,13 +400,19 @@ export const requestAPI = {
       .then((response) => response.data)
       .catch((error) => logError(error.message));
   },
-  createItem(itemInfo: any) {
+  createItem(itemInfo: ItemInitType) {
     const formData = new FormData();
 
-    // need to find another way
-    Object.keys(itemInfo).forEach((key: string) =>
-      formData.append(key, itemInfo[key])
-    );
+    Object.keys(itemInfo).forEach((key: string) => {
+      formData.append(
+        key,
+        key === 'tags'
+          ? JSON.stringify(itemInfo[key as keyof ItemInitType])
+          : itemInfo[key as keyof ItemInitType] instanceof File
+          ? (itemInfo[key as keyof ItemInitType] as File)
+          : String(itemInfo[key as keyof ItemInitType])
+      );
+    });
 
     return axios
       .post(baseURL + API.CreateItem, formData, {
@@ -505,12 +519,17 @@ export const requestAPI = {
       .then((response) => response.data)
       .catch((error) => logError(error.message));
   },
-  updateCollection(collectionInfo: any) {
+  updateCollection(collectionInfo: CollectionUpdateType) {
     const formData = new FormData();
 
     // need to find another way
     Object.keys(collectionInfo).forEach((key: string) =>
-      formData.append(key, collectionInfo[key])
+      formData.append(
+        key,
+        collectionInfo[key as keyof CollectionUpdateType] instanceof File
+          ? (collectionInfo[key as keyof CollectionUpdateType] as File)
+          : String(collectionInfo[key as keyof CollectionUpdateType])
+      )
     );
 
     return axios
@@ -522,12 +541,17 @@ export const requestAPI = {
       .then((response) => response.data)
       .catch((error) => logError(error.message));
   },
-  updateItem(itemInfo: any) {
+  updateItem(itemInfo: ItemUpdateType) {
     const formData = new FormData();
 
     // need to find another way
     Object.keys(itemInfo).forEach((key: string) =>
-      formData.append(key, itemInfo[key])
+      formData.append(
+        key,
+        itemInfo[key as keyof ItemType] instanceof File
+          ? (itemInfo[key as keyof ItemType] as File)
+          : String(itemInfo[key as keyof ItemType])
+      )
     );
 
     return axios

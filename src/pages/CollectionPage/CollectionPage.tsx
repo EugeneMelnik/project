@@ -1,3 +1,4 @@
+import { CustomFieldType, IconValue, ItemInitType, ItemType, ItemUpdateType, MatchTagType } from '../../types';
 import React, { FC, useState } from 'react';
 import {
   Avatar,
@@ -15,7 +16,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import MDEditor from '@uiw/react-md-editor';
 import moment from 'moment';
 import AddIcon from '@mui/icons-material/Add';
-import { ItemInitType, ItemType } from '../../types';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import Table from '../../components/Table/Table';
 import ItemForm from '../../components/ItemForm/ItemForm';
@@ -32,10 +32,10 @@ const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
 interface ICollectionPage {
   userId: number;
   id: number;
-  icon: any;
+  icon: IconValue;
   description: string;
   theme: string;
-  customFields: any;
+  customFields: CustomFieldType[] | null;
   createdAt: string;
   list: ItemType[] | null;
   role: 'Admin' | 'User' | 'Reader' | null;
@@ -47,12 +47,12 @@ interface ICollectionPage {
   setDeleteItems: (itemIds: number[]) => void;
   pullOutItem: (itemId: number) => void;
   deleteItem: (itemId: number) => void;
-  updateItem: (item: any) => void;
+  updateItem: (item: ItemUpdateType) => void;
   toogleLike: (userId: number, itemId: number) => void;
   authorId: number;
   likes: { itemId: number }[] | null;
   searchMatchTags: (tag: string) => void;
-  matchTags: any;
+  matchTags: MatchTagType[] | null;
   getCollectionItems: (collectionId: number) => void;
 }
 

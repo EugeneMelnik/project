@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 import { connect } from 'react-redux';
 import { CredentialsType, signUpThunk } from '../../redux/actions/user-action';
+import { AppDispatchType } from '../../redux';
 import SignUpPage from './SignUpPage';
 
 interface ILoginPageContainer {
@@ -13,7 +14,7 @@ const SignUpPageContainer: FC<ILoginPageContainer> = (props) => (
 
 const mapStateToProps = () => ({});
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: AppDispatchType) => ({
   signUpUser: (credentials: CredentialsType) => dispatch(signUpThunk(credentials)),
 });
 

@@ -1,6 +1,6 @@
 import React, { FC, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { AppStateType } from '../../redux';
+import { AppDispatchType, AppStateType } from '../../redux';
 import { setTargetCollectionAction } from '../../redux/actions/collection-action';
 import {
   createNewCollectionThunk,
@@ -27,7 +27,7 @@ import {
   getUserSurname,
 } from '../../redux/selectors/user-selector';
 import Preloader from '../../shared/components/Preloader/Preloader';
-import { CollectionInitType, CollectionType } from '../../types';
+import { CollectionInitType, CollectionType, CollectionUpdateType } from '../../types';
 
 interface IUserPageContainer {
   id: number;
@@ -47,7 +47,7 @@ interface IUserPageContainer {
   getDeleteCollections: (userId: string) => void;
   collectionsEdit: Array<CollectionType | null>;
   collectionsDel: Array<CollectionType | null>;
-  updateCollection: (collection: any) => void;
+  updateCollection: (collection: CollectionUpdateType) => void;
   pullOutCollection: (collectionId: number) => void;
   getCollectionThemes: () => void;
   collectionThemes: { id: number; value: string }[] | null;
@@ -89,7 +89,7 @@ const mapStateToProps = (state: AppStateType) => ({
   isLoading: getIsLoading(state),
 });
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: AppDispatchType) => ({
   setTargetCollection: (collection: CollectionType) => {
     dispatch(setTargetCollectionAction(collection));
   },
@@ -114,7 +114,7 @@ const mapDispatchToProps = (dispatch: any) => ({
   getDeleteCollections: (userId: string) => {
     dispatch(getDeleteCollectionsThunk(userId));
   },
-  updateCollection: (collection: any) => {
+  updateCollection: (collection: CollectionUpdateType) => {
     dispatch(updateCollectionThunk(collection));
   },
   pullOutCollection: (collectionId: number) => {

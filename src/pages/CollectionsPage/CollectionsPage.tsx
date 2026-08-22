@@ -50,7 +50,7 @@ const CollectionsPage: FC<ICollectionsPage> = ({
           />
         </Box>
       )}
-      {allCollections?.slice(id ? 1 : 0).map(
+      {allCollections?.filter((user) => user.id !== id).map(
         (user) => user.collections.countCollections !== 0 && (
         <Box key={user.id}>
           <Typography variant="h3">{user.name}</Typography>

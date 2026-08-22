@@ -13,7 +13,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import CollectionForm from '../../components/CollectionForm/CollectionForm';
 import Slider from '../../components/Slider/Slider';
-import { CollectionInitType, CollectionType } from '../../types';
+import { CollectionInitType, CollectionType, CollectionUpdateType } from '../../types';
 import ModalEditCollection from '../../components/ModalEditCollection/ModalEditCollection';
 import ModalDelete from '../../components/ModalDelete/ModalDelete';
 import { useLanguage } from '../../context/LanguageContext';
@@ -37,7 +37,7 @@ interface IUserPage {
   setDeleteCollection: (collectionId: number) => void;
   collectionsEdit: Array<CollectionType | null>;
   collectionsDel: Array<CollectionType | null>;
-  updateCollection: (collection: any) => void;
+  updateCollection: (collection: CollectionUpdateType) => void;
   pullOutCollection: (collectionId: number) => void;
   getMyCollections: (userId: number, page?: number) => void;
   getCollectionThemes: () => void;

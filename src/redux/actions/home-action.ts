@@ -1,5 +1,6 @@
 import { requestAPI } from '../../api/api';
 import { CollectionType, ItemType } from '../../types';
+import type { AppDispatchType } from '../index';
 import { setSearchItemsAction, setSearchListAction } from './search-action';
 
 export enum HomeActionTypes {
@@ -34,7 +35,7 @@ const getLastAddItemsAction = (items: ItemType[]) => ({
   items,
 });
 
-export const getBigCollectionsThunk = () => (dispatch: any) => {
+export const getBigCollectionsThunk = () => (dispatch: AppDispatchType) => {
   dispatch(setIsLoadingAction(true));
 
   requestAPI
@@ -47,7 +48,7 @@ export const getBigCollectionsThunk = () => (dispatch: any) => {
     });
 };
 
-export const getLastAddItemsThunk = () => (dispatch: any) => {
+export const getLastAddItemsThunk = () => (dispatch: AppDispatchType) => {
   requestAPI.getLastAddItems().then((response) => {
     if (Array.isArray(response)) {
       dispatch(getLastAddItemsAction(response as ItemType[]));
@@ -55,7 +56,7 @@ export const getLastAddItemsThunk = () => (dispatch: any) => {
   });
 };
 
-export const getAllTagsThunk = () => (dispatch: any) => {
+export const getAllTagsThunk = () => (dispatch: AppDispatchType) => {
   requestAPI.getAllTags().then((response) => {
     if (Array.isArray(response)) {
       dispatch(setAllTagsAction(response));
@@ -63,9 +64,10 @@ export const getAllTagsThunk = () => (dispatch: any) => {
   });
 };
 
-export const searchItemsByTagThunk = (tag: string) => (dispatch: any) => {
-  requestAPI.searchItemsByTag(tag).then((response) => {
-    dispatch(setSearchItemsAction(response.items));
-    dispatch(setSearchListAction());
-  });
-};
+export const searchItemsByTagThunk =
+  (tag: string) => (dispatch: AppDispatchType) => {
+    requestAPI.searchItemsByTag(tag).then((response) => {
+      dispatch(setSearchItemsAction(response.items));
+      dispatch(setSearchListAction());
+    });
+  };

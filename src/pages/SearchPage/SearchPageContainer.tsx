@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { connect } from 'react-redux';
-import { AppStateType } from '../../redux';
+import { AppDispatchType, AppStateType } from '../../redux';
 import { getTargetUserCollectionsThunk } from '../../redux/actions/admin-action';
 import { setTargetCollectionAction } from '../../redux/actions/collection-action';
 import {
@@ -46,7 +46,7 @@ const mapStateToProps = (state: AppStateType) => ({
   isLoading: getIsLoading(state),
 });
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: AppDispatchType) => ({
   setTargetCollection: (collection: CollectionType) => {
     dispatch(setTargetCollectionAction(collection));
   },

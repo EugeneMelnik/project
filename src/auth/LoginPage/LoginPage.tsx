@@ -89,8 +89,8 @@ const LoginPage: FC<ILoginPage> = ({ id, loginUser }) => {
         navigate(RoutesApp.User);
 
         resetForm({ values: { email: '', password: '' } });
-      } catch (error: any) {
-        logError(error.message);
+      } catch (error: unknown) {
+        logError(error instanceof Error ? error.message : String(error));
       }
     },
   });
@@ -100,8 +100,8 @@ const LoginPage: FC<ILoginPage> = ({ id, loginUser }) => {
       await signInWithGoogle();
 
       navigate(RoutesApp.User);
-    } catch (error: any) {
-      logError(error.message);
+    } catch (error: unknown) {
+      logError(error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -110,8 +110,8 @@ const LoginPage: FC<ILoginPage> = ({ id, loginUser }) => {
       await signInWithFacebook();
 
       navigate(RoutesApp.User);
-    } catch (error: any) {
-      logError(error.message);
+    } catch (error: unknown) {
+      logError(error instanceof Error ? error.message : String(error));
     }
   }
 

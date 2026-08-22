@@ -1,3 +1,13 @@
+export type IconValue = string | File | null | undefined;
+export type CustomFieldType = Record<string, string>;
+export type MatchTagType = { content: string };
+export type ItemUpdateType = Omit<Partial<ItemType>, 'tags' | 'icon'> & {
+  itemId: number;
+  tags: string[];
+  icon: IconValue;
+};
+export type ApiCodeResponse = { code: number };
+
 export interface CommentType {
   content: string;
   user: {
@@ -20,9 +30,9 @@ export interface UntouchedCommentType {
 export interface ItemInitType {
   collectionId: number;
   title: string;
-  tags: string;
-  icon: any;
-  comments: CommentType[] | null;
+  tags: string[];
+  icon: IconValue;
+  comments?: CommentType[] | null;
   dateValue1?: string;
   dateValue2?: string;
   dateValue3?: string;
@@ -44,7 +54,7 @@ export interface ItemType {
   title: string;
   tags: { content: string }[] | null;
   likes: { itemId: number }[] | null;
-  icon: any;
+  icon: IconValue;
   isEdit: boolean;
   isDelete: boolean;
   collectionId?: string;
@@ -75,7 +85,7 @@ export interface CollectionInitType {
   title: string;
   userId: number;
   theme: string;
-  icon: any;
+  icon: IconValue;
   description: string;
   dateKeys: null | string[];
   multiLineKeys: null | string[];
@@ -85,16 +95,41 @@ export interface CollectionInitType {
   checkboxKeys: null | { [keys: string]: string }[];
 }
 
+export interface CollectionUpdateType {
+  collectionId: number;
+  icon: IconValue;
+  description: string | null;
+  theme: string | null;
+  radioKey1: string | null;
+  radioKey2: string | null;
+  radioKey3: string | null;
+  numberKey1: string | null;
+  numberKey2: string | null;
+  numberKey3: string | null;
+  dateKey1: string | null;
+  dateKey2: string | null;
+  dateKey3: string | null;
+  multiLineKey1: string | null;
+  multiLineKey2: string | null;
+  multiLineKey3: string | null;
+  textKey1: string | null;
+  textKey2: string | null;
+  textKey3: string | null;
+  checkboxKey1: string | null;
+  checkboxKey2: string | null;
+  checkboxKey3: string | null;
+}
+
 export interface CollectionType {
   id: number | null;
-  icon: any;
+  icon: IconValue;
   title: string | null;
   description: string | null;
   theme: string | null;
   allFields: string[];
   isEdit: boolean;
   isDelete: boolean;
-  customFields: any;
+  customFields: CustomFieldType[] | null;
   createdAt: string | null;
   updatedAt: string | null;
   list: ItemType[] | null;
@@ -120,23 +155,23 @@ export interface CollectionType {
   listEditItems: Array<ItemType | null>;
   listDeleteItems: Array<ItemType | null>;
   userId: number | null;
-  matchTags: any;
+  matchTags: MatchTagType[] | null;
   untouchedComments: null | UntouchedCommentType[];
   isLoading: boolean;
 }
 
 export interface CollectionsPageType {
   allCollections:
-  | {
-    id: number;
-    name: string;
-    surname: string;
-    collections: {
-      collections: CollectionType[] | null;
-      countCollections: number;
-    };
-  }[]
-  | null;
+    | {
+        id: number;
+        name: string;
+        surname: string;
+        collections: {
+          collections: CollectionType[] | null;
+          countCollections: number;
+        };
+      }[]
+    | null;
   targetCollections: {
     name: string;
     surname: string;
@@ -148,7 +183,7 @@ export interface CollectionsPageType {
 export interface HomePageType {
   collections: CollectionType[] | null;
   list: ItemType[] | null;
-  tags: { content: string }[] | null;
+  tags: { content: string; value?: number }[] | null;
   isLoading: boolean;
 }
 
@@ -187,23 +222,17 @@ export interface UserPageType {
 }
 
 export interface SearchPageType {
-  itemsSearch: any;
-  usersSearch:
-  | {
-    name: string;
-    surname: string;
-    collections: Array<CollectionType | null>;
-  }[]
-  | null;
-  listSearch:
-  | ItemType[]
-  | {
-    name: string;
-    surname: string;
-    collections: Array<CollectionType | null>;
-  }[]
-  | null;
+  itemsSearch: ItemType[] | null;
+  usersSearch: SearchUserType[] | null;
+  listSearch: ItemType[] | SearchUserType[] | null;
   isLoading: boolean;
+}
+
+export interface SearchUserType {
+  id?: number;
+  name: string;
+  surname: string;
+  collections: (CollectionType | null)[];
 }
 
 export interface TargetUserType {

@@ -129,8 +129,8 @@ const SignUpPage: FC<ISignUpPage> = ({ signUpUser }) => {
             confirm: '',
           },
         });
-      } catch (error: any) {
-        logError(error.message);
+      } catch (error: unknown) {
+        logError(error instanceof Error ? error.message : String(error));
       }
     },
   });

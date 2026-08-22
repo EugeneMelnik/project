@@ -13,8 +13,11 @@ import {
   MenuItem,
   Select,
   TextField,
+  SelectChangeEvent,
 } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
+import type { AppDispatchType } from '../redux';
+import type { ItemType } from '../types';
 import CheckIcon from '@mui/icons-material/Check';
 import {
   filterContainsThunk,
@@ -34,39 +37,39 @@ export const inputTextValue = (props: GridFilterInputValueProps) => {
   // need to find another way
   const { collectionId } = useParams();
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatchType>();
 
-  const elemRef: React.Ref<any> = React.useRef(null);
+  const elemRef = React.useRef<HTMLInputElement>(null);
   React.useImperativeHandle(focusElementRef, () => ({
     focus: () => {
-      elemRef.current.querySelector('input').focus();
+      elemRef.current?.focus();
     },
   }));
 
-  const handleFilterChange = (event: any) => {
+  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value);
   };
 
-  function handleSubmit(e: any) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (!collectionId) return;
 
     if (item.operatorValue?.toLowerCase() === 'contains') {
       dispatch(
-        filterContainsThunk(+collectionId, item.columnField, value) as any,
+        filterContainsThunk(+collectionId, item.columnField, value),
       );
     }
 
     if (item.operatorValue?.toLowerCase() === 'equals') {
       dispatch(
-        filterEqualsThunk(+collectionId, item.columnField, value) as any,
+        filterEqualsThunk(+collectionId, item.columnField, value),
       );
     }
 
     if (item.operatorValue?.toLowerCase() === 'starts with') {
       dispatch(
-        filterStartsWithThunk(+collectionId, item.columnField, value) as any,
+        filterStartsWithThunk(+collectionId, item.columnField, value),
       );
     }
 
@@ -104,48 +107,48 @@ export const inputDateValue = (props: GridFilterInputValueProps) => {
   // need to find another way
   const { collectionId } = useParams();
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatchType>();
 
-  const elemRef: React.Ref<any> = React.useRef(null);
+  const elemRef = React.useRef<HTMLInputElement>(null);
   React.useImperativeHandle(focusElementRef, () => ({
     focus: () => {
-      elemRef.current.querySelector('input').focus();
+      elemRef.current?.focus();
     },
   }));
 
-  const handleFilterChange = (event: any) => {
+  const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value);
   };
 
-  function handleSubmit(e: any) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (!collectionId) return;
 
     if (item.operatorValue === 'after') {
       dispatch(
-        filterMoreThanThunk(+collectionId, item.columnField, value) as any,
+        filterMoreThanThunk(+collectionId, item.columnField, value),
       );
     }
 
     if (item.operatorValue === 'before') {
       dispatch(
-        filterLessThanThunk(+collectionId, item.columnField, value) as any,
+        filterLessThanThunk(+collectionId, item.columnField, value),
       );
     }
 
     if (item.operatorValue?.toLowerCase() === 'is') {
       dispatch(
-        filterEqualsThunk(+collectionId, item.columnField, value) as any,
+        filterEqualsThunk(+collectionId, item.columnField, value),
       );
     }
 
     if (item.operatorValue?.toLowerCase() === 'empty') {
-      dispatch(filterIsEmptyThunk(+collectionId, item.columnField) as any);
+      dispatch(filterIsEmptyThunk(+collectionId, item.columnField));
     }
 
     if (item.operatorValue?.toLowerCase() === 'is not empty') {
-      dispatch(filterIsNotEmptyThunk(+collectionId, item.columnField) as any);
+      dispatch(filterIsNotEmptyThunk(+collectionId, item.columnField));
     }
 
     setValue('');
@@ -182,26 +185,26 @@ export const ButtonSubmit = (props: GridFilterInputValueProps) => {
   // need to find another way
   const { collectionId } = useParams();
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatchType>();
 
-  const elemRef: React.Ref<any> = React.useRef(null);
+  const elemRef = React.useRef<HTMLButtonElement>(null);
   React.useImperativeHandle(focusElementRef, () => ({
     focus: () => {
-      elemRef.current.querySelector('input').focus();
+      elemRef.current?.focus();
     },
   }));
 
-  function handleClick(e: any) {
+  function handleClick(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
 
     if (!collectionId) return;
 
     if (item.operatorValue?.toLowerCase() === 'empty') {
-      dispatch(filterIsEmptyThunk(+collectionId, item.columnField) as any);
+      dispatch(filterIsEmptyThunk(+collectionId, item.columnField));
     }
 
     if (item.operatorValue?.toLowerCase() === 'is not empty') {
-      dispatch(filterIsNotEmptyThunk(+collectionId, item.columnField) as any);
+      dispatch(filterIsNotEmptyThunk(+collectionId, item.columnField));
     }
   }
 
@@ -218,37 +221,37 @@ export const selectTagValue = (props: GridFilterInputValueProps) => {
   // need to find another way
   const { collectionId } = useParams();
 
-  const uniqTags = new Set();
+  const uniqTags = new Set<string>();
 
-  const result: any = useSelector(getCollectionListSelector);
+  const result: ItemType[] | null = useSelector(getCollectionListSelector);
 
-  result.forEach((item: any) => {
-    item.tags.forEach((tag: { content: string }) => {
-      uniqTags.add({ content: tag.content });
+  result?.forEach((item) => {
+    item.tags?.forEach((tag) => {
+      uniqTags.add(tag.content);
     });
   });
 
   const allTags = Array.from(uniqTags);
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatchType>();
 
-  const selectRef: React.Ref<any> = React.useRef(null);
+  const selectRef = React.useRef<HTMLDivElement>(null);
   React.useImperativeHandle(focusElementRef, () => ({
     focus: () => {
-      selectRef.current.querySelector('input').focus();
+      selectRef.current?.querySelector('input')?.focus();
     },
   }));
 
-  const handleFilterChange = (event: any) => {
+  const handleFilterChange = (event: SelectChangeEvent) => {
     setValue(event.target.value);
   };
 
-  function handleSubmit(e: any) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     if (!collectionId) return;
 
-    dispatch(filterExistTagThunk(+collectionId, value) as any);
+    dispatch(filterExistTagThunk(+collectionId, value));
 
     setValue('');
   }
@@ -275,13 +278,13 @@ export const selectTagValue = (props: GridFilterInputValueProps) => {
         fullWidth
       >
         <MenuItem value="" />
-        {allTags?.map((item: any, idx: any) => (
+        {allTags.map((item, idx: number) => (
           <MenuItem
             // eslint-disable-next-line react/no-array-index-key
             key={idx}
-            value={item.content}
+            value={item}
           >
-            {item.content}
+            {item}
           </MenuItem>
         ))}
       </Select>

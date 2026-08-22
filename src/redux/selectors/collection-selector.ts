@@ -1,11 +1,11 @@
 import { AppStateType } from '..';
-import { ItemType } from '../../types';
+import { CollectionType, IconValue, ItemType } from '../../types';
 
 export function getCollectionIdSelector(state: AppStateType): number {
   return state.collection.id as number;
 }
 
-export function getCollectionIconSelector(state: AppStateType): any {
+export function getCollectionIconSelector(state: AppStateType): IconValue {
   return state.collection.icon;
 }
 
@@ -25,18 +25,20 @@ export function getCollectionUpdatedAtSelector(state: AppStateType): string {
   return state.collection.updatedAt as string;
 }
 
-export function getCollectionCustomFieldsSelector(state: AppStateType): any {
+export function getCollectionCustomFieldsSelector(
+  state: AppStateType
+): CollectionType['customFields'] {
   return state.collection.customFields;
 }
 
 export function getCollectionListSelector(
-  state: AppStateType,
+  state: AppStateType
 ): ItemType[] | null {
   return state.collection.list;
 }
 
 export function getCollectionTargetItemSelector(
-  state: AppStateType,
+  state: AppStateType
 ): ItemType | null {
   return state.collection.targetItem;
 }

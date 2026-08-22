@@ -27,7 +27,7 @@ import HourglassTopIcon from '@mui/icons-material/HourglassTop';
 import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 import InputFile from '../../shared/components/InputFile/InputFile';
-import { CollectionType } from '../../types';
+import { CollectionType, CollectionUpdateType, IconValue } from '../../types';
 import UpdateFormField from '../UpdateFormField/UpdateFormField';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -107,7 +107,7 @@ interface IModalEditCollection {
   openModal: boolean;
   setOpen: (state: boolean) => void;
   collectionsEdit: Array<CollectionType | null>;
-  updateCollection: (collection: any) => void;
+  updateCollection: (collection: CollectionUpdateType) => void;
   pullOutCollection: (collectionId: number) => void;
   collectionThemes: { id: number; value: string }[] | null;
 }
@@ -120,9 +120,9 @@ const ModalEditCollection: FC<IModalEditCollection> = ({
   pullOutCollection,
   collectionThemes,
 }) => {
-  const [image, setImage] = useState<any>();
-  const [description, setDescription] = useState<any>('');
-  const [collectionId, setCollectionId] = useState<any>('');
+  const [image, setImage] = useState<IconValue>();
+  const [description, setDescription] = useState<string>('');
+  const [collectionId, setCollectionId] = useState<number>(0);
 
   const { language } = useLanguage();
 
@@ -130,7 +130,10 @@ const ModalEditCollection: FC<IModalEditCollection> = ({
     if (!collectionsEdit.length) setOpen(false);
   }, [collectionsEdit]);
 
-  function handleResetForm(formik: any, fieldName: string) {
+  function handleResetForm<T>(
+    formik: { values: T; resetForm: (config?: { values: T }) => void },
+    fieldName: string,
+  ) {
     formik.resetForm({
       values: { ...formik.values, [fieldName]: '' },
     });
@@ -258,7 +261,7 @@ const ModalEditCollection: FC<IModalEditCollection> = ({
           subheader={<li />}
         >
           {collectionsEdit?.map(
-            (collection: any) => collection && (
+            (collection: CollectionType | null) => collection && (
             <FormikProvider key={collection.id} value={formik}>
               <form
                 encType="multipart/form-data"
@@ -399,7 +402,7 @@ const ModalEditCollection: FC<IModalEditCollection> = ({
                           source={
                                 description
                                   ? description.replace(/&&#&&/gim, '\n')
-                                  : collection.description.replace(
+                                  : (collection.description || '').replace(
                                     /&&#&&/gim,
                                     '\n',
                                   )
@@ -421,7 +424,7 @@ const ModalEditCollection: FC<IModalEditCollection> = ({
                                 language.modalEditCollection.description,
                         }}
                         value={description}
-                        onChange={setDescription}
+                        onChange={(value) => setDescription(value || '')}
                       />
                     </Box>
                     <Box>
@@ -443,12 +446,12 @@ const ModalEditCollection: FC<IModalEditCollection> = ({
                         component="img"
                         height="194"
                         image={`data:application/pdf;base64,${collection.icon}`}
-                        alt={collection.title}
+                        alt={collection.title || ''}
                       />
                       )}
                     </Box>
                     {Object.keys(collection).map(
-                      (key, idx: any) => collection[key]
+                      (key, idx: number) => collection[key as keyof CollectionType]
                             && ![
                               'isEdit',
                               'id',
@@ -465,7 +468,7 @@ const ModalEditCollection: FC<IModalEditCollection> = ({
                                 // eslint-disable-next-line react/no-array-index-key
                                 key={`${key}-${idx}`}
                                 formik={formik}
-                                value={collection[key]}
+                                value={String(collection[key as keyof CollectionType] || '')}
                                 field={key}
                               />
                       ),
@@ -477,6 +480,7 @@ const ModalEditCollection: FC<IModalEditCollection> = ({
                         flex: 1,
                       }}
                       onClick={() => {
+                        if (collection.id === null) return;
                         setCollectionId(collection.id);
                         formik.handleSubmit();
                       }}

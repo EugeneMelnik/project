@@ -15,7 +15,9 @@ function homeReducer(state = initState, action: AnyAction) {
     case HomeActionTypes.setBigCollections: {
       return {
         ...state,
-        collections: [...action.collections],
+        collections: Array.isArray(action.collections)
+          ? [...action.collections]
+          : [],
       };
     }
     case HomeActionTypes.setIsLoading: {
@@ -27,13 +29,13 @@ function homeReducer(state = initState, action: AnyAction) {
     case HomeActionTypes.getLastAddItems: {
       return {
         ...state,
-        list: [...action.items],
+        list: Array.isArray(action.items) ? [...action.items] : [],
       };
     }
     case HomeActionTypes.setAllTags: {
       return {
         ...state,
-        tags: [...action.tags],
+        tags: Array.isArray(action.tags) ? [...action.tags] : [],
       };
     }
     case UserActionTypes.increaseLikes: {

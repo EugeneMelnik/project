@@ -19,7 +19,7 @@ import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 import InputFile from '../../shared/components/InputFile/InputFile';
-import { ItemType } from '../../types';
+import { CustomFieldType, IconValue, ItemType, ItemUpdateType, MatchTagType } from '../../types';
 import CustomField from '../CustomField/CustomField';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -85,10 +85,10 @@ interface IModalEditItem {
   setOpen: (state: boolean) => void;
   itemsEdit: Array<ItemType | null>;
   pullOutItem: (itemId: number) => void;
-  updateItem: (item: any) => void;
-  customFields: any;
+  updateItem: (item: ItemUpdateType) => void;
+  customFields: CustomFieldType[] | null;
   searchMatchTags: (tag: string) => void;
-  matchTags: any;
+  matchTags: MatchTagType[] | null;
 }
 
 const ModalEditItem: FC<IModalEditItem> = ({
@@ -102,8 +102,8 @@ const ModalEditItem: FC<IModalEditItem> = ({
   matchTags,
 }) => {
   const [tags, setTags] = useState<string[]>([]);
-  const [image, setImage] = useState<any>();
-  const [itemId, setItemId] = useState<any>('');
+  const [image, setImage] = useState<IconValue>();
+  const [itemId, setItemId] = useState<number>(0);
 
   const { language } = useLanguage();
 
@@ -113,10 +113,10 @@ const ModalEditItem: FC<IModalEditItem> = ({
     setTags(tags.filter((tag) => tag !== str));
   };
 
-  function getInitFields(customFields: any) {
-    let obj = {};
+  function getInitFields(fields: CustomFieldType[] | null) {
+    let obj: Record<string, string> = {};
 
-    customFields?.forEach((customField: any) => {
+    fields?.forEach((customField) => {
       const [key] = Object.keys(customField);
       obj = {
         ...obj,
@@ -131,13 +131,13 @@ const ModalEditItem: FC<IModalEditItem> = ({
     if (!itemsEdit.length) setOpen(false);
   }, [itemsEdit]);
 
-  function handleSetTag(formik: any) {
+  function handleSetTag(formik: { values: { tags: string } }) {
     if (formik.values.tags.trim()) {
       searchMatchTags(formik.values.tags);
     }
   }
 
-  function handlePushTag(formik: any) {
+  function handlePushTag(formik: { values: { tags: string } }) {
     if (!formik.values.tags.trim()) return;
 
     setTags([
@@ -194,7 +194,7 @@ const ModalEditItem: FC<IModalEditItem> = ({
           <FormikProvider value={formik}>
             <form encType="multipart/form-data" onSubmit={formik.handleSubmit}>
               {itemsEdit?.map(
-                (item: any) => item && (
+                (item: ItemType | null) => item && (
                 <ListItem
                   key={item.id}
                   sx={{
@@ -324,7 +324,7 @@ const ModalEditItem: FC<IModalEditItem> = ({
                     <Box>
                       <Box>
                         {matchTags?.map(
-                          (matchTag: { content: string }, idx: any) => (
+                          (matchTag: MatchTagType, idx: number) => (
                             <Chip
                                   // eslint-disable-next-line react/no-array-index-key
                               key={idx}
@@ -349,7 +349,7 @@ const ModalEditItem: FC<IModalEditItem> = ({
                     </Box>
                     <Box>
                       {customFields
-                            && customFields.map((field: any, idx: any) => (
+                            && customFields.map((field, idx: number) => (
                               <CustomField
                                 typeField="update"
                                 // eslint-disable-next-line react/no-array-index-key

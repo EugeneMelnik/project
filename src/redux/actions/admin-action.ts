@@ -1,5 +1,6 @@
 import { requestAPI } from '../../api/api';
 import { UserType } from '../../types';
+import type { AppDispatchType } from '../index';
 import { setMeIsNotAdminAction } from './user-action';
 
 export enum AdminActionTypes {
@@ -20,7 +21,7 @@ export const setIsLoadingAction = (isLoading: boolean) => ({
   isLoading,
 });
 
-export const setTargetUser = (user: any) => ({
+export const setTargetUser = (user: UserType) => ({
   type: AdminActionTypes.setTargetUser,
   user,
 });
@@ -59,29 +60,32 @@ export const deleteUser = (userId: number) => ({
   userId,
 });
 
-export const setTargetUserCollectons = (collections: any) => ({
+export const setTargetUserCollectons = (collections: unknown) => ({
   type: AdminActionTypes.setTargetCollections,
   collections,
 });
 
-export const getTargetUserCollectionsThunk = (userId: number, page = 1) => (dispatch: any) => {
-  requestAPI.getUserCollections(userId, page).then((response) => {
-    dispatch(setTargetUserCollectons(response));
-  });
-};
-
-export const getTargetUserThunk = (userId: number) => (dispatch: any) => {
-  dispatch(setIsLoadingAction(true));
-
-  requestAPI
-    .getTargetUser(userId)
-    .finally(() => dispatch(setIsLoadingAction(false)))
-    .then((response) => {
-      dispatch(setTargetUser(response));
+export const getTargetUserCollectionsThunk =
+  (userId: number, page = 1) =>
+  (dispatch: AppDispatchType) => {
+    requestAPI.getUserCollections(userId, page).then((response) => {
+      dispatch(setTargetUserCollectons(response));
     });
-};
+  };
 
-export const getAllUsersThunk = () => (dispatch: any) => {
+export const getTargetUserThunk =
+  (userId: number) => (dispatch: AppDispatchType) => {
+    dispatch(setIsLoadingAction(true));
+
+    requestAPI
+      .getTargetUser(userId)
+      .finally(() => dispatch(setIsLoadingAction(false)))
+      .then((response) => {
+        dispatch(setTargetUser(response));
+      });
+  };
+
+export const getAllUsersThunk = () => (dispatch: AppDispatchType) => {
   dispatch(setIsLoadingAction(true));
 
   requestAPI
@@ -90,25 +94,30 @@ export const getAllUsersThunk = () => (dispatch: any) => {
     .then((response) => dispatch(setAllUsers(response)));
 };
 
-export const blockUserThunk = (userId: number) => (dispatch: any) => {
-  requestAPI.blockUser(userId).then(() => dispatch(setUserBlock(userId)));
-};
+export const blockUserThunk =
+  (userId: number) => (dispatch: AppDispatchType) => {
+    requestAPI.blockUser(userId).then(() => dispatch(setUserBlock(userId)));
+  };
 
-export const unblockUserThunk = (userId: number) => (dispatch: any) => {
-  requestAPI.unblockUser(userId).then(() => dispatch(setUserUnblock(userId)));
-};
+export const unblockUserThunk =
+  (userId: number) => (dispatch: AppDispatchType) => {
+    requestAPI.unblockUser(userId).then(() => dispatch(setUserUnblock(userId)));
+  };
 
-export const setIsAdminThunk = (userId: number) => (dispatch: any) => {
-  requestAPI.setIsAdmin(userId).then(() => dispatch(setUserIsAdmin(userId)));
-};
+export const setIsAdminThunk =
+  (userId: number) => (dispatch: AppDispatchType) => {
+    requestAPI.setIsAdmin(userId).then(() => dispatch(setUserIsAdmin(userId)));
+  };
 
-export const removeFromAdminsThunk = (userId: number) => (dispatch: any) => {
-  requestAPI.setIsNotAdmin(userId).then(() => {
-    dispatch(setUserIsNotAdmin(userId));
-    dispatch(setMeIsNotAdminAction(userId));
-  });
-};
+export const removeFromAdminsThunk =
+  (userId: number) => (dispatch: AppDispatchType) => {
+    requestAPI.setIsNotAdmin(userId).then(() => {
+      dispatch(setUserIsNotAdmin(userId));
+      dispatch(setMeIsNotAdminAction(userId));
+    });
+  };
 
-export const deleteUserThunk = (userId: number) => (dispatch: any) => {
-  requestAPI.deleteUser(userId).then(() => dispatch(deleteUser(userId)));
-};
+export const deleteUserThunk =
+  (userId: number) => (dispatch: AppDispatchType) => {
+    requestAPI.deleteUser(userId).then(() => dispatch(deleteUser(userId)));
+  };

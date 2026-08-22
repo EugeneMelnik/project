@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { connect } from 'react-redux';
-import { AppStateType } from '../../redux';
+import { AppDispatchType, AppStateType } from '../../redux';
 import { loginThunk } from '../../redux/actions/user-action';
 import { getUserIdFirebase } from '../../redux/selectors/user-selector';
 import LoginPage from './LoginPage';
@@ -18,7 +18,7 @@ const mapStateToProps = (state: AppStateType) => ({
   id: getUserIdFirebase(state),
 });
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: AppDispatchType) => ({
   loginUser: (userId: string) => dispatch(loginThunk(userId)),
 });
 

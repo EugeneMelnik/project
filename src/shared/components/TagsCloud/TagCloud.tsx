@@ -1,32 +1,21 @@
 import React, { FC } from 'react';
-import { TagCloud } from 'react-tagcloud';
-import { keyframes } from '@emotion/react';
-import { Box } from '@mui/material';
+import WordCloud from 'react-d3-cloud';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
 import { useNavigate } from 'react-router';
 import RoutesApp from '../../../constants/routes';
 
-const blinker = keyframes({ '50%': { opacity: 0 } });
+interface TagCloudTag {
+  content: string;
+  value?: number;
+}
 
-const customRenderer = (tag: any, size: any, color: any) => (
-  <Box
-    key={tag.content}
-    sx={{
-      animation: `${blinker} 1s linear infinite`,
-      display: 'inline-block',
-      animationDelay: `${Math.random() * 2}s`,
-      fontSize: `${size / 2}em`,
-      border: `2px solid ${color}`,
-      margin: '0.3rem',
-      padding: '0.3rem',
-      color,
-    }}
-  >
-    {tag.content}
-  </Box>
-);
+interface CloudWord {
+  text: string;
+  value: number;
+}
 
 interface ITagCloudComponent {
-  tags: any[];
+  tags: TagCloudTag[];
   searchItemsByTag: (tag: string) => void;
 }
 
@@ -35,22 +24,37 @@ const TagCloudComponent: FC<ITagCloudComponent> = ({
   searchItemsByTag,
 }) => {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   function handleSearchItemsByTag(tag: string) {
     searchItemsByTag(tag);
 
     navigate(RoutesApp.Search);
   }
+
+  const words = tags.map((tag) => ({
+    text: tag.content,
+    value: tag.value || 1,
+  }));
+
   return (
-    <TagCloud
-      tags={tags}
-      minSize={1}
-      maxSize={5}
-      renderer={customRenderer}
-      onClick={(tag: { content: string }) => {
-        handleSearchItemsByTag(tag.content);
-      }}
-    />
+    <Box sx={{ width: '100%', minHeight: 300, overflow: 'hidden' }}>
+      <WordCloud
+        data={words}
+        width={isSmallScreen ? 320 : 650}
+        height={isSmallScreen ? 260 : 300}
+        font="inherit"
+        fontWeight="600"
+        fontSize={(word: CloudWord) => Math.min(42, 16 + word.value * 2)}
+        rotate={(word: CloudWord) => (word.text.length > 8 ? 0 : (word.value % 2) * 12 - 6)}
+        padding={8}
+        fill={() => (theme.palette.mode === 'dark'
+          ? theme.palette.secondary.light
+          : theme.palette.primary.dark)}
+        onWordClick={(_event, word) => handleSearchItemsByTag(word.text)}
+      />
+    </Box>
   );
 };
 

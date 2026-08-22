@@ -6,6 +6,7 @@ import {
 import FileDownloadDoneIcon from '@mui/icons-material/FileDownloadDone';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { useLanguage } from '../../../context/LanguageContext';
+import { IconValue } from '../../../types';
 
 const useStyles = makeStyles({
   file: {
@@ -28,8 +29,8 @@ const useStyles = makeStyles({
 });
 
 interface IInputFile {
-  image: any;
-  setImage: (image: any) => void;
+  image: IconValue;
+  setImage: (image: IconValue) => void;
 }
 
 const InputFile: FC<IInputFile> = ({ image, setImage }) => {
@@ -45,8 +46,8 @@ const InputFile: FC<IInputFile> = ({ image, setImage }) => {
         inputProps={{ accept: 'image/*' }}
         className={classes.file}
         type="file"
-        onChange={(e: any) => {
-          setImage(e.target.files[0]);
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          setImage(e.target.files?.[0]);
         }}
       />
       {image ? (
@@ -63,7 +64,7 @@ const InputFile: FC<IInputFile> = ({ image, setImage }) => {
       {image && (
         <CardMedia
           component="img"
-          image={URL.createObjectURL(image)}
+          image={image instanceof File ? URL.createObjectURL(image) : image}
           alt="download"
           height="190"
         />

@@ -49,6 +49,7 @@ export const languages = {
       actions: 'Actions',
       rowsPerPage: 'Rows per page',
       created: 'Created',
+      ready: 'Ready',
     },
     collectionsPage: {
       myCollections: 'My collections',
@@ -65,10 +66,12 @@ export const languages = {
       multiLines: 'Fields for entering multi-line text',
       radioFields: 'Fields with yes/no selection',
       checkboxFields: 'Fields with multiple choices',
+      addPhoto: 'Add photo',
       delete: 'Delete',
       addField: 'Add field',
       reset: 'Reset',
       confirm: 'Confirm',
+      ready: 'Ready',
     },
     modalEditCollection: {
       title: 'Title',
@@ -102,111 +105,112 @@ export const languages = {
       likes: 'Likes',
     },
   },
-  by: {
-    mode: 'by',
+  rus: {
+    mode: 'rus',
     auth: {
-      signUp: 'Зарэгістравацца',
-      login: 'Увайсці',
-      email: 'Электронная пошта',
+      signUp: 'Зарегистрироваться',
+      login: 'Войти',
+      email: 'Электронная почта',
       password: 'Пароль',
-      name: 'Імя',
-      surname: 'Прозвішча',
-      confirmPassword: 'Пацвердзіць пароль',
+      name: 'Имя',
+      surname: 'Фамилия',
+      confirmPassword: 'Подтвердить пароль',
     },
-    search: 'Знайсці',
+    search: 'Поиск',
     adminPage: {
-      block: 'Блакаваць',
-      unblock: 'Разблакаваць',
-      makeAdmin: 'Зрабіць адмінам',
-      removeAdmin: 'Выдаліць з адміна',
-      delete: 'Выдаліць',
-      active: 'актыўны',
-      blocked: 'заблакаваны',
-      admin: 'адмін',
+      block: 'Заблокировать',
+      unblock: 'Разблокировать',
+      makeAdmin: 'Назначить администратором',
+      removeAdmin: 'Убрать из администраторов',
+      delete: 'Удалить пользователя',
+      active: 'активен',
+      blocked: 'заблокирован',
+      admin: 'администратор',
     },
     userPage: {
-      createCollection: 'Стварыць',
-      edit: 'Рэдагаваць',
-      delete: 'Кошык',
+      createCollection: 'Создать',
+      edit: 'Редактировать',
+      delete: 'Корзина',
     },
     collectionPage: {
-      createItem: 'Стварыць',
-      edit: 'Рэдагаваць',
-      delete: 'Кошык',
-      putDelete: 'Закінуць у кошык',
-      addPhoto: 'Add photo',
-      putEdit: 'Зрабіць выпраўленні',
-      filterCleaning: 'Ачысціць фільтр',
-      export: 'Экспарт',
-      title: 'Назва',
-      tags: 'Тэгі',
-      likes: 'Падабайкі',
-      actions: 'Дзеянні',
-      rowsPerPage: 'Радкоў на старонцы',
-      created: 'Створана',
-      ready: 'Ready',
+      createItem: 'Создать',
+      edit: 'Редактировать',
+      delete: 'Корзина',
+      putDelete: 'Переместить в корзину',
+      addPhoto: 'Добавить фото',
+      putEdit: 'Редактировать',
+      filterCleaning: 'Сбросить фильтр',
+      export: 'Экспорт',
+      title: 'Название',
+      tags: 'Теги',
+      likes: 'Лайки',
+      actions: 'Действия',
+      rowsPerPage: 'Строк на странице',
+      created: 'Создано',
+      ready: 'Готово',
     },
     collectionsPage: {
-      myCollections: 'Мае калекцыі',
+      myCollections: 'Мои коллекции',
     },
     modalCreateCollection: {
-      title: 'Назва',
-      theme: 'Тэма',
-      description: 'Апісанне',
-      nameField: 'Назва поля',
-      nameOption: 'Назва выбару',
-      addPhoto: 'Дадаць фота',
-      numbers: 'Палі для ўводу лікаў',
-      texts: 'Палі для ўводу аднарадковага тэксту',
-      dates: 'Палі для ўводу даты',
-      multiLines: 'Палі для ўводу шматрадковага тэксту',
-      radioFields: 'Палі з вабарам да/не',
-      checkboxFields: 'Палі з варыянтамі выбару',
-      delete: 'Выдаліць',
-      addField: 'Дадаць поле',
-      reset: 'Сцерці',
-      confirm: 'Пацвердзіць',
-      ready: 'Гатова',
+      title: 'Название',
+      theme: 'Тема',
+      description: 'Описание',
+      nameField: 'Название поля',
+      nameOption: 'Название варианта',
+      addPhoto: 'Добавить фото',
+      numbers: 'Поля для ввода чисел',
+      texts: 'Поля для однострочного текста',
+      dates: 'Поля для ввода дат',
+      multiLines: 'Поля для многострочного текста',
+      radioFields: 'Поля с выбором да/нет',
+      checkboxFields: 'Поля с несколькими вариантами',
+      delete: 'Удалить',
+      addField: 'Добавить поле',
+      reset: 'Сбросить',
+      confirm: 'Подтвердить',
+      ready: 'Готово',
     },
     modalEditCollection: {
-      title: 'Назва',
-      theme: 'Тэма',
-      description: 'Апісанне',
-      variants: 'Варыянты',
-      update: 'Абнавіць',
-      pullOut: 'Дастаць',
-      reset: 'Сцерці',
-      created: 'Створаны',
+      title: 'Название',
+      theme: 'Тема',
+      description: 'Описание',
+      variants: 'Варианты',
+      update: 'Обновить',
+      pullOut: 'Восстановить',
+      reset: 'Сбросить',
+      created: 'Создано',
     },
     modalEditItem: {
-      title: 'Назва',
-      update: 'Абнавіць',
-      pullOut: 'Дастаць',
-      reset: 'Сцерці',
-      enterBtn: 'Для дадання новага тэга націсніце ўвод',
-      tags: 'Тэгі',
-      created: 'Створаны',
+      title: 'Название',
+      update: 'Обновить',
+      pullOut: 'Восстановить',
+      reset: 'Сбросить',
+      enterBtn: 'Нажмите Enter, чтобы добавить новый тег',
+      tags: 'Теги',
+      created: 'Создано',
     },
     modalDelete: {
-      delete: 'Выдаліць',
-      pullOut: 'Дастаць',
-      created: 'Створаны',
+      delete: 'Удалить',
+      pullOut: 'Восстановить',
+      created: 'Создано',
     },
     itemPage: {
-      created: 'Створаны',
-      comments: 'Каментары',
-      addComment: 'Дадаць каментар',
-      myComments: 'Мае каментары',
-      likes: 'Падабайкі',
+      created: 'Создано',
+      comments: 'Комментарии',
+      addComment: 'Добавить комментарий',
+      myComments: 'Мои комментарии',
+      likes: 'Лайки',
     },
   },
 };
 
-type LanguageType = 'eng' | 'by';
+type LanguageType = keyof typeof languages;
+type LanguageValue = (typeof languages)[LanguageType];
 
 interface ILanguage {
-  language: any;
-  setLanguage:(language: any) => void;
+  language: LanguageValue;
+  setLanguage: (language: LanguageType) => void;
 }
 
 export function setLanguageValue(value: LanguageType) {
@@ -214,7 +218,8 @@ export function setLanguageValue(value: LanguageType) {
 }
 
 export function getLanguage() {
-  return localStorage.getItem('language') as LanguageType | null;
+  const value = localStorage.getItem('language');
+  return value === 'rus' ? value : 'eng';
 }
 
 const LanguageContext = createContext<ILanguage | null>(null);
@@ -222,7 +227,7 @@ const LanguageContext = createContext<ILanguage | null>(null);
 export const LanguageContextProvider: FC<{ children: ReactElement }> = ({
   children,
 }) => {
-  const [language, setLanguage] = useState(languages[getLanguage() || 'eng']);
+  const [language, setLanguage] = useState<LanguageValue>(languages[getLanguage()]);
 
   const handleSetLanguage = (language: LanguageType) => {
     setLanguage(languages[language]);

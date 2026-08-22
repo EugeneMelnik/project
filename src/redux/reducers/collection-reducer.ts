@@ -94,7 +94,7 @@ function collectionReducer(state = initState, action: AnyAction) {
     case CollectionActionTypes.SetTargetCollectionItems: {
       return {
         ...state,
-        list: [...action.items],
+        list: Array.isArray(action.items) ? [...action.items] : [],
       };
     }
     case CollectionActionTypes.AddNewItem: {
@@ -127,7 +127,7 @@ function collectionReducer(state = initState, action: AnyAction) {
     case CollectionActionTypes.UpdateListItems: {
       return {
         ...state,
-        list: [...action.items],
+        list: Array.isArray(action.items) ? [...action.items] : [],
       };
     }
     case CollectionActionTypes.UpdateEditListItems: {
@@ -141,11 +141,12 @@ function collectionReducer(state = initState, action: AnyAction) {
       });
 
       const listItems = listEditItems?.filter(
-        (item) => !state.listEditItems.find((itemState) => itemState?.id === item.id),
+        (item) =>
+          !state.listEditItems.find((itemState) => itemState?.id === item.id)
       );
 
       const listDeleteItems = state.listDeleteItems?.filter(
-        (item) => !listItems?.find((itemState) => itemState?.id === item?.id),
+        (item) => !listItems?.find((itemState) => itemState?.id === item?.id)
       );
 
       return {
@@ -161,7 +162,7 @@ function collectionReducer(state = initState, action: AnyAction) {
     case CollectionActionTypes.SetEditListItems: {
       return {
         ...state,
-        listEditItems: [...action.items],
+        listEditItems: Array.isArray(action.items) ? [...action.items] : [],
       };
     }
     case CollectionActionTypes.SetUntouchedComments: {
@@ -190,11 +191,12 @@ function collectionReducer(state = initState, action: AnyAction) {
       });
 
       const listItems = listDeleteItems?.filter(
-        (item) => !state.listDeleteItems.find((itemState) => itemState?.id === item.id),
+        (item) =>
+          !state.listDeleteItems.find((itemState) => itemState?.id === item.id)
       );
 
       const listEditItems = state.listEditItems?.filter(
-        (item) => !listItems?.find((itemState) => itemState?.id === item?.id),
+        (item) => !listItems?.find((itemState) => itemState?.id === item?.id)
       );
 
       return {
@@ -208,17 +210,17 @@ function collectionReducer(state = initState, action: AnyAction) {
     case CollectionActionTypes.SetDeleteListItems: {
       return {
         ...state,
-        listDeleteItems: [...action.items],
+        listDeleteItems: Array.isArray(action.items) ? [...action.items] : [],
       };
     }
     case CollectionActionTypes.PullOutItem: {
       return {
         ...state,
         listEditItems: state.listEditItems.filter(
-          (collection) => collection?.id !== action.itemId,
+          (collection) => collection?.id !== action.itemId
         ),
         listDeleteItems: state.listDeleteItems.filter(
-          (collection) => collection?.id !== action.itemId,
+          (collection) => collection?.id !== action.itemId
         ),
       };
     }

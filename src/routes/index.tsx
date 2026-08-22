@@ -21,10 +21,7 @@ const AppRoutes: FC<IAppRoutes> = ({ toggleLike }) => (
     <Route path={RoutesApp.SignUp} element={<SignUpPageContainer />} />
     <Route path={RoutesApp.Root} element={<RootPage />}>
       <Route path={RoutesApp.Admin} element={<AdminPageContainer />} />
-      <Route
-        path={RoutesApp.Home}
-        element={<HomePageContainer toogleLike={toggleLike} />}
-      />
+      <Route index element={<HomePageContainer toogleLike={toggleLike} />} />
       <Route path={RoutesApp.User} element={<UserPageContainer />} />
       <Route
         path={RoutesApp.Collection}

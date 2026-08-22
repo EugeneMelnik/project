@@ -1,5 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
+import { AnyAction } from 'redux';
 import thunkMiddleware from 'redux-thunk';
+import { ThunkDispatch } from 'redux-thunk';
 import adminReducer from './reducers/admin-reducer';
 import authReducer from './reducers/auth-reducer';
 import collectionReducer from './reducers/collection-reducer';
@@ -22,11 +24,11 @@ export const store = configureStore({
 });
 
 export type AppStateType = ReturnType<typeof store.getState>;
-export type AppDispatchType = typeof store.dispatch;
+export type AppDispatchType = ThunkDispatch<AppStateType, unknown, AnyAction>;
 
 declare global {
   interface Window {
-    store: any;
+    store: typeof store;
   }
 }
 window.store = store;

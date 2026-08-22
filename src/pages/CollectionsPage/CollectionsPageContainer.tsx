@@ -1,6 +1,6 @@
 import React, { FC, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { AppStateType } from '../../redux';
+import { AppDispatchType, AppStateType } from '../../redux';
 import CollectionsPage from './CollectionsPage';
 import { CollectionType } from '../../types';
 import { setTargetCollectionAction } from '../../redux/actions/collection-action';
@@ -45,7 +45,6 @@ interface ICollectionsPageContainer {
   getMyCollections: (userId: number, page?: number) => void;
   getUserCollections: (userId: number, page?: number) => void;
   getTargetCollections: (userId: number | string, page?: number) => void;
-  targetCollections: any;
   isLoading: boolean;
 }
 
@@ -78,7 +77,7 @@ const mapStateToProps = (state: AppStateType) => ({
   isLoading: getIsLoading(state),
 });
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: AppDispatchType) => ({
   setCollection: (collection: CollectionType) => {
     dispatch(setTargetCollectionAction(collection));
   },

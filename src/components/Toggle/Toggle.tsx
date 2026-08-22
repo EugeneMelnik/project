@@ -53,7 +53,7 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   },
 }));
 
-const Toggle: FC<any> = () => {
+const Toggle: FC = () => {
   const { theme, setTheme } = useTheme();
 
   return (

@@ -26,7 +26,7 @@ interface IHomePage {
   toogleLike: (userId: number, itemId: number) => void;
   userId: number;
   likes: { itemId: number }[] | null;
-  tags: any[];
+  tags: { content: string; value?: number }[] | null;
   searchItemsByTag: (tag: string) => void;
 }
 

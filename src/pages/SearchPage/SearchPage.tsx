@@ -2,11 +2,11 @@ import React, { FC } from 'react';
 import { Typography } from '@mui/material';
 import Slider from '../../components/Slider/Slider';
 import CardItem from '../../shared/components/CardItem/CardItem';
-import { CollectionType, ItemType } from '../../types';
+import { CollectionType, ItemType, SearchUserType } from '../../types';
 
 interface ISearchPage {
   userId: number;
-  listSearch: any;
+  listSearch: ItemType[] | SearchUserType[] | null;
   setTargetCollection: (collection: CollectionType) => void;
   getTargetUserCollections: (id: number, page?: number) => void;
   toogleLike: (userId: number, itemId: number) => void;
@@ -27,7 +27,7 @@ const SearchPage: FC<ISearchPage> = ({
     {listSearch?.length}
     {' '}
     {listSearch?.length === 1 ? 'link' : 'links'}
-    {listSearch?.map((data: any) => (data?.name ? (
+    {listSearch?.map((data) => ('name' in data ? (
       <>
         <Typography variant="body2">
           {data.name}
@@ -35,8 +35,13 @@ const SearchPage: FC<ISearchPage> = ({
           {data.surname}
         </Typography>
         <Slider
-          collections={data.collections}
-          id={data.id}
+          collections={{
+            collections: data.collections.filter(
+              (collection): collection is CollectionType => collection !== null,
+            ),
+            countCollections: data.collections.length,
+          }}
+          id={data.id || 0}
           setCollection={setTargetCollection}
           getUserCollections={getTargetUserCollections}
         />
@@ -44,7 +49,7 @@ const SearchPage: FC<ISearchPage> = ({
     ) : (
       <CardItem
         likes={likes}
-        item={data as ItemType}
+        item={data}
         userId={userId}
         toogleLike={toogleLike}
       />

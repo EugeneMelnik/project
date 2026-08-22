@@ -2,7 +2,7 @@ import React, { FC, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Route, Routes, useParams } from 'react-router-dom';
 import RoutesApp from '../../constants/routes';
-import { AppStateType } from '../../redux';
+import { AppDispatchType, AppStateType } from '../../redux';
 import {
   createNewItemThunk,
   deleteItemThunk,
@@ -42,7 +42,7 @@ import {
   getUserRole,
 } from '../../redux/selectors/user-selector';
 import Preloader from '../../shared/components/Preloader/Preloader';
-import { ItemInitType, ItemType } from '../../types';
+import { CustomFieldType, IconValue, ItemInitType, ItemType, ItemUpdateType, MatchTagType } from '../../types';
 import ItemPage from '../ItemPage/ItemPage';
 import CollectionPage from './CollectionPage';
 
@@ -50,10 +50,10 @@ interface ICollectionPageContainer {
   userId: number;
   authorId: number;
   id: number;
-  icon: any;
+  icon: IconValue;
   description: string;
   theme: string;
-  customFields: string[];
+  customFields: CustomFieldType[] | null;
   createdAt: string;
   targetItem: ItemType | null;
   list: ItemType[] | null;
@@ -72,11 +72,11 @@ interface ICollectionPageContainer {
   getEditItems: (collectionId: number) => void;
   getDeleteItems: (collectionId: number) => void;
   pullOutItem: (itemId: number) => void;
-  updateItem: (item: any) => void;
+  updateItem: (item: ItemUpdateType) => void;
   toogleLike: (userId: number, itemId: number) => void;
   likes: { itemId: number }[] | null;
   searchMatchTags: (tag: string) => void;
-  matchTags: any;
+  matchTags: MatchTagType[] | null;
   getAllComments: (itemId: number) => void;
   addComment: (content: string, userId: number, itemId: number) => void;
   setCommentsTouched: (itemId: number) => void;
@@ -150,7 +150,7 @@ const mapStateToProps = (state: AppStateType) => ({
   isLoading: getIsLoading(state),
 });
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: AppDispatchType) => ({
   createNewItem: (itemInfo: ItemInitType) => dispatch(createNewItemThunk(itemInfo)),
   getTargetCollection: (collectionId: number) => dispatch(getTargetCollectionThunk(collectionId)),
   getTargetItem: (itemId: number, collectionId: number) => {
@@ -180,7 +180,7 @@ const mapDispatchToProps = (dispatch: any) => ({
   pullOutItem: (itemId: number) => {
     dispatch(pullOutItemThunk(itemId));
   },
-  updateItem: (item: any) => {
+  updateItem: (item: ItemUpdateType) => {
     dispatch(updateItemThunk(item));
   },
   searchMatchTags: (tag: string) => {

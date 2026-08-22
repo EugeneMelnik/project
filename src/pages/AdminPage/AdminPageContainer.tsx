@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { io } from 'socket.io-client';
 import RoutesApp from '../../constants/routes';
-import { AppStateType } from '../../redux';
+import { AppDispatchType, AppStateType } from '../../redux';
 import {
   blockUserThunk,
   clearAdminStateAction,
@@ -61,8 +61,8 @@ const AdminPageContainer: FC<IAdminPageContainer> = (props) => {
     if (props.role && props.role !== 'Admin') {
       navigate(RoutesApp.Home);
     }
-    socket.on('isNotAdmin', (res: any) => {
-      if (props.id === res.userId) {
+    socket.on('isNotAdmin', (res: unknown) => {
+      if (typeof res === 'object' && res !== null && 'userId' in res && props.id === res.userId) {
         logWarning('You are no longer an administrator');
       }
     });
@@ -93,7 +93,7 @@ const mapStateToProps = (state: AppStateType) => ({
   isLoading: getIsLoading(state),
 });
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: AppDispatchType) => ({
   getTargetUser: (id: number) => dispatch(getTargetUserThunk(id)),
   getTargetUserCollections: (userId: number, page?: number) => {
     dispatch(getTargetUserCollectionsThunk(userId, page));

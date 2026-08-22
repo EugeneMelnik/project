@@ -1,6 +1,6 @@
 import React, { FC, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { AppStateType } from '../../redux';
+import { AppDispatchType, AppStateType } from '../../redux';
 import {
   getAllTagsThunk,
   getBigCollectionsThunk,
@@ -29,7 +29,7 @@ interface IHomePageContainer {
   toogleLike: (userId: number, itemId: number) => void;
   userId: number;
   likes: { itemId: number }[] | null;
-  tags: any[];
+  tags: { content: string; value?: number }[] | null;
   getAllTags: () => void;
   searchItemsByTag: (tag: string) => void;
   isLoading: boolean;
@@ -65,11 +65,11 @@ const mapStateToProps = (state: AppStateType) => ({
   collections: getCollectionsSelector(state),
   list: getItemsSelector(state),
   likes: getLikesSelector(state),
-  tags: getTagsSelector(state) as any[],
+  tags: getTagsSelector(state),
   isLoading: getIsLoading(state),
 });
 
-const mapDispatchToProps = (dispatch: any) => ({
+const mapDispatchToProps = (dispatch: AppDispatchType) => ({
   getBigCollections: () => dispatch(getBigCollectionsThunk()),
   getLastAddItems: () => dispatch(getLastAddItemsThunk()),
   getAllTags: () => dispatch(getAllTagsThunk()),

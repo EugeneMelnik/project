@@ -111,7 +111,7 @@ const CardItem: FC<ICardItem> = ({
         </Typography>
       </CardContent>
     )}
-    {item.tags?.map((tag, idx: any) => (
+    {item.tags?.map((tag, idx: number) => (
       <Chip
         icon={<TagIcon />}
         variant="outlined"

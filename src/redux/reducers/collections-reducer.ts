@@ -11,17 +11,35 @@ const initState: CollectionsPageType = {
 function collectionsReducer(state = initState, action: AnyAction) {
   switch (action.type) {
     case CollectionsActionTypes.setAllCollections: {
-      const allCollections = action.users.map((user: any) => ({
-        id: user.data.id,
-        name: user.data.name,
-        surname: user.data.surname,
-        collections: user.data.collections,
-      }));
+      const allCollections = (Array.isArray(action.users) ? action.users : [])
+        .filter((user: any) => user && (user.data || user.id))
+        .reduce((users: any[], collection: any) => {
+          const data = collection.data || collection;
+          const owner = data.user || {};
+          const id =
+            data.id && data.collections ? data.id : data.userId || owner.id;
+          if (!id) return users;
 
-      return {
-        ...state,
-        allCollections: allCollections ? [...allCollections] : null,
-      };
+          const existingUser = users.find((user) => user.id === id);
+          if (existingUser) {
+            existingUser.collections.collections.push(data);
+            existingUser.collections.countCollections += 1;
+            return users;
+          }
+
+          users.push({
+            id,
+            name: data.name || owner.name || '',
+            surname: data.surname || owner.surname || '',
+            collections: data.collections || {
+              collections: [data],
+              countCollections: 1,
+            },
+          });
+          return users;
+        }, []);
+
+      return { ...state, allCollections };
     }
     case CollectionsActionTypes.setIsLoading: {
       return {

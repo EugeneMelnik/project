@@ -20,7 +20,7 @@ import {
 import { styled } from '@mui/material/styles';
 import HourglassTopIcon from '@mui/icons-material/HourglassTop';
 import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
-import { CollectionInitType } from '../../types';
+import { CollectionInitType, IconValue } from '../../types';
 import FormArray from '../FormArray/FormArray';
 import InputFile from '../../shared/components/InputFile/InputFile';
 import { useLanguage } from '../../context/LanguageContext';
@@ -47,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     rowGap: '1.4rem',
     padding: '1.4rem',
-    height: '15rem',
+    maxHeight: '80vh',
     overflowY: 'scroll',
 
     [theme.breakpoints.down('sm')]: {
@@ -109,6 +109,17 @@ const validationSchema = yup.object({
     .required('Subject is required'),
 });
 
+interface CollectionFormValues {
+  title: string;
+  theme: string;
+  numbers: string[];
+  dates: string[];
+  multiLines: string[];
+  radioFields: string[];
+  texts: string[];
+  checkboxes: { field: string; count: number; values: string[] }[];
+}
+
 const CollectionForm: FC<ICollectionForm> = ({
   userId,
   openForm,
@@ -116,8 +127,8 @@ const CollectionForm: FC<ICollectionForm> = ({
   createNewCollection,
   collectionThemes,
 }) => {
-  const [description, setDescription] = useState<any>('');
-  const [image, setImage] = useState<any>();
+  const [description, setDescription] = useState<string>('');
+  const [image, setImage] = useState<IconValue>();
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const { language } = useLanguage();
@@ -128,7 +139,7 @@ const CollectionForm: FC<ICollectionForm> = ({
     setOpenForm(false);
   };
 
-  const formik = useFormik({
+  const formik = useFormik<CollectionFormValues>({
     initialValues: {
       title: '',
       theme: '',
@@ -219,7 +230,7 @@ const CollectionForm: FC<ICollectionForm> = ({
           <form
             className={classes.form}
             encType="multipart/form-data"
-            onSubmit={(e: any) => {
+            onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
               setIsSubmitted(true);
 
               return formik.handleSubmit(e);
@@ -269,9 +280,9 @@ const CollectionForm: FC<ICollectionForm> = ({
                   backgroundColor: 'transparent',
                 }}
                 value={description}
-                onChange={(e: any) => {
+                onChange={(e: string | undefined) => {
                   setIsSubmitted(false);
-                  setDescription(e);
+                  setDescription(e || '');
                 }}
               />
               {isSubmitted && (
@@ -309,7 +320,7 @@ const CollectionForm: FC<ICollectionForm> = ({
                         {language.modalCreateCollection.addField}
                       </Button>
                     </Box>
-                    {checkboxes.slice(1).map((date: string, idx: any) => (
+                    {checkboxes.slice(1).map((date: CollectionFormValues['checkboxes'][number], idx: number) => (
                       // eslint-disable-next-line react/no-array-index-key
                       <Box key={idx}>
                         <Box className={classes.input}>
@@ -350,7 +361,7 @@ const CollectionForm: FC<ICollectionForm> = ({
                                 return (
                                   <>
                                     {arrCheckboxes.map(
-                                      (value: string, index: any) => (
+                                      (value: string, index: number) => (
                                         // eslint-disable-next-line react/no-array-index-key
                                         <Box key={index}>
                                           <TextField

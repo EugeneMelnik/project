@@ -12,16 +12,28 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { Field } from 'formik';
+import {
+  Field,
+  FormikErrors,
+  FormikHandlers,
+  FormikTouched,
+} from 'formik';
+import { FormikProps } from 'formik';
 import EditIcon from '@mui/icons-material/Edit';
 
-interface ICustomField {
-  formik: any;
-  field: any;
+interface ICustomField<T extends object> {
+  formik: {
+    values: T;
+    handleChange: FormikHandlers['handleChange'];
+    setFieldValue: (field: string, value: unknown) => void;
+    touched: FormikTouched<T>;
+    errors: FormikErrors<T>;
+  };
+  field: Record<string, string>;
   typeField: 'create' | 'update';
 }
 
-const CustomField: FC<ICustomField> = ({ formik, field, typeField }) => {
+const CustomField = <T extends object>({ formik, field, typeField }: ICustomField<T>) => {
   const [showFormEl, setShowFormEl] = useState<boolean>(false);
 
   const [key] = Object.keys(field);
@@ -43,7 +55,7 @@ const CustomField: FC<ICustomField> = ({ formik, field, typeField }) => {
           {(showFormEl || typeField === 'create') && (
             <TextareaAutosize
               name={key}
-              value={formik.values.field}
+              value={String(formik.values[key as keyof T] || '')}
               onChange={formik.handleChange}
               style={{
                 minHeight: '5rem',
@@ -73,7 +85,7 @@ const CustomField: FC<ICustomField> = ({ formik, field, typeField }) => {
             </Box>
           </Box>
           {(showFormEl || typeField === 'create')
-            && checkboxes.map((value: string, index: any) => (
+            && checkboxes.map((value: string, index: number) => (
               // eslint-disable-next-line jsx-a11y/label-has-associated-control
               <label style={{ marginLeft: '1.4rem' }} key={index}>
                 <Field
@@ -83,7 +95,7 @@ const CustomField: FC<ICustomField> = ({ formik, field, typeField }) => {
                   checked={value === state}
                   onChange={() => {
                     setState(value);
-                    formik.values[key] = value;
+                    formik.setFieldValue(key, value);
                   }}
                 />
                 {value}
@@ -108,7 +120,7 @@ const CustomField: FC<ICustomField> = ({ formik, field, typeField }) => {
             {(showFormEl || typeField === 'create') && (
               <RadioGroup
                 name={key}
-                value={formik.values.field}
+                value={String(formik.values[key as keyof T] || '')}
                 onChange={formik.handleChange}
               >
                 <FormControlLabel
@@ -146,10 +158,10 @@ const CustomField: FC<ICustomField> = ({ formik, field, typeField }) => {
             name={key}
             fullWidth
             InputLabelProps={{ shrink: true }}
-            value={formik.values.field}
+            value={String(formik.values[key as keyof T] || '')}
             onChange={formik.handleChange}
-            error={formik.touched.field && Boolean(formik.errors.field)}
-            helperText={formik.touched.field && formik.errors.field}
+            error={Boolean(formik.touched[key as keyof T] && formik.errors[key as keyof T])}
+            helperText={formik.touched[key as keyof T] ? String(formik.errors[key as keyof T] || '') : ''}
           />
         )}
       </Box>

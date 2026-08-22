@@ -4,11 +4,13 @@ import { logError, logSuccess } from '../../services/logger';
 import {
   CollectionInitType,
   CollectionType,
+  CollectionUpdateType,
   UserPersonalInfoType,
 } from '../../types';
 import { setIsAuthAction } from './auth-action';
 import { clearCollectionStateAction } from './collection-action';
 import { clearCollectionsStateAction } from './collections-action';
+import type { AppDispatchType } from '../index';
 
 export interface CredentialsType {
   id: string;
@@ -104,7 +106,7 @@ const updateEditCollectionsAction = (collectionId: number) => ({
   collectionId,
 });
 
-const pullOutCollectionAction = (collectionId: CollectionType) => ({
+const pullOutCollectionAction = (collectionId: number) => ({
   type: UserActionTypes.pullOutCollectionAction,
   collectionId,
 });
@@ -139,7 +141,7 @@ export const setMeIsNotAdminAction = (userId: number) => ({
 });
 
 export const signUpThunk =
-  (credentials: CredentialsType) => (dispatch: any) => {
+  (credentials: CredentialsType) => (dispatch: AppDispatchType) => {
     dispatch(setIsAuthAction(false));
 
     requestAPI
@@ -152,7 +154,7 @@ export const signUpThunk =
       });
   };
 
-export const logOutThunk = (userId: string) => (dispatch: any) => {
+export const logOutThunk = (userId: string) => (dispatch: AppDispatchType) => {
   requestAPI.logOutUser(userId).then(() => {
     dispatch(logoutUserAction());
     dispatch(clearCollectionsStateAction());
@@ -160,12 +162,12 @@ export const logOutThunk = (userId: string) => (dispatch: any) => {
   });
 };
 
-export const loginThunk = (_userId: string) => (dispatch: any) => {
+export const loginThunk = (_userId: string) => (dispatch: AppDispatchType) => {
   dispatch(setIsAuthAction(true));
 };
 
 export const getUserPersonalInfoThunk =
-  (payload: CredentialsType) => (dispatch: any) => {
+  (payload: CredentialsType) => (dispatch: AppDispatchType) => {
     dispatch(setIsAuthAction(false));
 
     requestAPI
@@ -188,7 +190,7 @@ export const getUserPersonalInfoThunk =
       });
   };
 
-export const getCollectionThemesThunk = () => (dispatch: any) => {
+export const getCollectionThemesThunk = () => (dispatch: AppDispatchType) => {
   requestAPI.getThemes().then((response) => {
     if (Array.isArray(response)) {
       dispatch(setCollectionThemesAction(response));
@@ -198,19 +200,21 @@ export const getCollectionThemesThunk = () => (dispatch: any) => {
 
 export const getMyCollectionsThunk =
   (userId: number, page = 1) =>
-  (dispatch: any) => {
+  (dispatch: AppDispatchType) => {
     dispatch(setIsLoadingAction(true));
 
     requestAPI
       .getMyCollections(userId, page)
       .finally(() => dispatch(setIsLoadingAction(false)))
       .then((response) => {
-        dispatch(setMyCollectionsAction(response as CollectionType[]));
+        if (response && Array.isArray(response.collections)) {
+          dispatch(setMyCollectionsAction(response));
+        }
       });
   };
 
 export const setEditCollectionThunk =
-  (collectionId: number) => (dispatch: any) => {
+  (collectionId: number) => (dispatch: AppDispatchType) => {
     dispatch(setIsLoadingAction(true));
 
     requestAPI
@@ -223,16 +227,17 @@ export const setEditCollectionThunk =
       });
   };
 
-export const getEditCollectionsThunk = (userId: string) => (dispatch: any) => {
-  requestAPI
-    .getEditCollections(userId)
-    .then((response) =>
-      dispatch(setEditCollectionsAction(response as CollectionType[]))
-    );
-};
+export const getEditCollectionsThunk =
+  (userId: string) => (dispatch: AppDispatchType) => {
+    requestAPI.getEditCollections(userId).then((response) => {
+      if (Array.isArray(response)) {
+        dispatch(setEditCollectionsAction(response));
+      }
+    });
+  };
 
 export const setDeleteCollectionThunk =
-  (collectionId: number) => (dispatch: any) => {
+  (collectionId: number) => (dispatch: AppDispatchType) => {
     dispatch(setIsLoadingAction(true));
 
     requestAPI
@@ -246,28 +251,29 @@ export const setDeleteCollectionThunk =
   };
 
 export const getDeleteCollectionsThunk =
-  (userId: string) => (dispatch: any) => {
-    requestAPI
-      .getDeleteCollections(userId)
-      .then((response) =>
-        dispatch(setDeleteCollectionsAction(response as CollectionType[]))
-      );
+  (userId: string) => (dispatch: AppDispatchType) => {
+    requestAPI.getDeleteCollections(userId).then((response) => {
+      if (Array.isArray(response)) {
+        dispatch(setDeleteCollectionsAction(response));
+      }
+    });
   };
 
-export const updateCollectionThunk = (collection: any) => (dispatch: any) => {
-  dispatch(setIsLoadingAction(true));
+export const updateCollectionThunk =
+  (collection: CollectionUpdateType) => (dispatch: AppDispatchType) => {
+    dispatch(setIsLoadingAction(true));
 
-  requestAPI
-    .updateCollection(collection)
-    .finally(() => dispatch(setIsLoadingAction(false)))
-    .then((response) => {
-      logSuccess('The collection has been updated');
-      dispatch(updateCollectionAction(response));
-    });
-};
+    requestAPI
+      .updateCollection(collection)
+      .finally(() => dispatch(setIsLoadingAction(false)))
+      .then((response) => {
+        logSuccess('The collection has been updated');
+        dispatch(updateCollectionAction(response));
+      });
+  };
 
 export const pullOutCollectionThunk =
-  (collectionId: any) => (dispatch: any) => {
+  (collectionId: number) => (dispatch: AppDispatchType) => {
     requestAPI.pullOutCollection(collectionId).then((response) => {
       if (response.code === 1) {
         dispatch(pullOutCollectionAction(collectionId));
@@ -276,13 +282,12 @@ export const pullOutCollectionThunk =
   };
 
 export const toggleLikeThunk =
-  (userId: number, itemId: number) => (dispatch: any) => {
+  (userId: number, itemId: number) => (dispatch: AppDispatchType) => {
     requestAPI.toogleLike(userId, itemId).then((response) => {
-      if (response.code === 0) return;
-      if (response.message === 'like') {
+      if (response?.liked) {
         dispatch(setLikeAction(itemId));
         dispatch(increaseLikesAction(itemId));
-      } else if (response.message === 'dislike') {
+      } else if (response && response.liked === false) {
         dispatch(setDislikeAction(itemId));
         dispatch(decreaseLikesAction(itemId));
       }
@@ -290,7 +295,7 @@ export const toggleLikeThunk =
   };
 
 export const createNewCollectionThunk =
-  (collectionInfo: CollectionInitType) => (dispatch: any) => {
+  (collectionInfo: CollectionInitType) => (dispatch: AppDispatchType) => {
     dispatch(setIsLoadingAction(true));
 
     requestAPI
@@ -303,7 +308,7 @@ export const createNewCollectionThunk =
   };
 
 export const deleteCollectionThunk =
-  (collectionId: number) => (dispatch: any) => {
+  (collectionId: number) => (dispatch: AppDispatchType) => {
     dispatch(setIsLoadingAction(true));
 
     requestAPI

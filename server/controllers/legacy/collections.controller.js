@@ -1,9 +1,16 @@
 import express from 'express';
+import multer from 'multer';
 import db from '../../db/models/index.js';
 import { imageData, imageDataList, pageLimit, sendError } from './helpers.js';
 
-const { collection: Collection, item: Item } = await db;
+const {
+  collection: Collection,
+  item: Item,
+  tag: Tag,
+  user: User,
+} = await db;
 const router = express.Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
 router.get('/getBigCollections', async (_req, res) => {
   try {
@@ -15,7 +22,10 @@ router.get('/getBigCollections', async (_req, res) => {
 router.get('/getAllCollections', async (req, res) => {
   try {
     const where = req.query.userId ? { userId: req.query.userId } : undefined;
-    return res.send(imageDataList(await Collection.findAll({ where })));
+    return res.send(imageDataList(await Collection.findAll({
+      where,
+      include: [{ model: User, attributes: ['id', 'name', 'surname'] }],
+    })));
   } catch (error) { return sendError(res, error); }
 });
 
@@ -37,6 +47,10 @@ for (const path of ['/getMyCollections', '/getUserCollections', '/getTargetColle
   });
 }
 
+router.get('/getEditCollections', async (_req, res) => res.send([]));
+
+router.get('/getDeleteCollections', async (_req, res) => res.send([]));
+
 router.get('/getCollection', async (req, res) => {
   try {
     const collection = await Collection.findOne({
@@ -52,18 +66,31 @@ router.get('/getCollectionItems', async (req, res) => {
   catch (error) { return sendError(res, error); }
 });
 
-router.post('/createCollection', async (req, res) => {
+router.get('/getEditItems', async (_req, res) => res.send([]));
+
+router.get('/getDeleteItems', async (_req, res) => res.send([]));
+
+router.put('/setEditCollection', async (_req, res) => res.send({ code: 1 }));
+
+router.put('/setDeleteCollection', async (_req, res) => res.send({ code: 1 }));
+
+router.put('/setEditItems', async (_req, res) => res.send({ code: 1 }));
+
+router.put('/setDeleteItems', async (_req, res) => res.send({ code: 1 }));
+
+router.post('/createCollection', upload.single('icon'), async (req, res) => {
   try {
     return res.status(201).send(await Collection.create({
       title: req.body.title,
       description: req.body.description,
-      subject: req.body.subject,
+      subject: req.body.subject || req.body.theme,
+      icon: req.file?.buffer,
       userId: req.body.userId,
     }));
   } catch (error) { return sendError(res, error); }
 });
 
-router.put('/updateCollection', async (req, res) => {
+router.put('/updateCollection', upload.any(), async (req, res) => {
   try {
     const { collectionId, ...updates } = req.body;
     await Collection.update(updates, { where: { id: collectionId } });
@@ -78,13 +105,38 @@ router.delete('/deleteCollection', async (req, res) => {
   } catch (error) { return sendError(res, error); }
 });
 
-router.post('/createItem', async (req, res) => {
+router.post('/createItem', upload.single('icon'), async (req, res) => {
   try {
-    return res.status(201).send(await Item.create({ title: req.body.title, collectionId: req.body.collectionId }));
+    const item = await Item.create({
+      title: req.body.title,
+      collectionId: req.body.collectionId,
+      icon: req.file?.buffer,
+    });
+
+    let tagValues = req.body.tags || [];
+    try {
+      tagValues = typeof tagValues === 'string' ? JSON.parse(tagValues) : tagValues;
+    } catch (_error) {
+      tagValues = tagValues.split(',');
+    }
+
+    if (!Array.isArray(tagValues)) tagValues = [tagValues];
+
+    const tags = [];
+    for (const value of tagValues) {
+      const content = String(value).trim();
+      if (!content) continue;
+      const [tag] = await Tag.findOrCreate({ where: { content } });
+      tags.push(tag);
+    }
+
+    if (tags.length) await item.addTags(tags);
+
+    return res.status(201).send(await Item.findByPk(item.id, { include: [{ model: Tag }] }));
   } catch (error) { return sendError(res, error); }
 });
 
-router.put('/updateItem', async (req, res) => {
+router.put('/updateItem', upload.any(), async (req, res) => {
   try {
     const { itemId, ...updates } = req.body;
     await Item.update(updates, { where: { id: itemId } });

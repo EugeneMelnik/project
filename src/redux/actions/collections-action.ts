@@ -1,4 +1,5 @@
 import { requestAPI } from '../../api/api';
+import type { AppDispatchType } from '../index';
 
 export enum CollectionsActionTypes {
   setAllCollections = 'SET-ALL-COLLECTIONS',
@@ -17,52 +18,57 @@ export const clearCollectionsStateAction = () => ({
   type: CollectionsActionTypes.clearCollectionsState,
 });
 
-const setAllCollectionsAction = (users: any) => ({
+const setAllCollectionsAction = (users: unknown) => ({
   type: CollectionsActionTypes.setAllCollections,
   users,
 });
 
-const setAllUserCollectionsAction = (user: any) => ({
+const setAllUserCollectionsAction = (user: unknown) => ({
   type: CollectionsActionTypes.setAllUserCollections,
   user,
 });
 
-const setTargetCollectionsAction = (user: any) => ({
+const setTargetCollectionsAction = (user: unknown) => ({
   type: CollectionsActionTypes.setTargetCollections,
   user,
 });
 
-export const getAllCollectionsThunk = (userId?: number) => (dispatch: any) => {
-  dispatch(setIsLoadingAction(true));
+export const getAllCollectionsThunk =
+  (userId?: number) => (dispatch: AppDispatchType) => {
+    dispatch(setIsLoadingAction(true));
 
-  requestAPI
-    .getAllCollections(userId)
-    .finally(() => dispatch(setIsLoadingAction(false)))
-    .then((response) => {
-      dispatch(setAllCollectionsAction(response));
-    });
-};
+    requestAPI
+      .getAllCollections(userId)
+      .finally(() => dispatch(setIsLoadingAction(false)))
+      .then((response) => {
+        dispatch(setAllCollectionsAction(response));
+      });
+  };
 
-export const getUserCollectionsThunk = (userId: number, page = 1) => (dispatch: any) => {
-  dispatch(setIsLoadingAction(true));
+export const getUserCollectionsThunk =
+  (userId: number, page = 1) =>
+  (dispatch: AppDispatchType) => {
+    dispatch(setIsLoadingAction(true));
 
-  requestAPI
-    .getUserCollections(userId, page)
-    .finally(() => dispatch(setIsLoadingAction(false)))
-    .then((response) => {
-      dispatch(
-        setAllUserCollectionsAction({ id: userId, collections: response }),
-      );
-    });
-};
+    requestAPI
+      .getUserCollections(userId, page)
+      .finally(() => dispatch(setIsLoadingAction(false)))
+      .then((response) => {
+        dispatch(
+          setAllUserCollectionsAction({ id: userId, collections: response })
+        );
+      });
+  };
 
-export const getTargetCollectionsThunk = (userId: number | string, page = 1) => (dispatch: any) => {
-  dispatch(setIsLoadingAction(true));
+export const getTargetCollectionsThunk =
+  (userId: number | string, page = 1) =>
+  (dispatch: AppDispatchType) => {
+    dispatch(setIsLoadingAction(true));
 
-  requestAPI
-    .getTargetCollections(userId, page)
-    .finally(() => dispatch(setIsLoadingAction(false)))
-    .then(([response]) => {
-      dispatch(setTargetCollectionsAction(response));
-    });
-};
+    requestAPI
+      .getTargetCollections(userId, page)
+      .finally(() => dispatch(setIsLoadingAction(false)))
+      .then(([response]) => {
+        dispatch(setTargetCollectionsAction(response));
+      });
+  };

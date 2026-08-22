@@ -1,5 +1,5 @@
 import { AnyAction } from 'redux';
-import { SearchPageType } from '../../types';
+import { ItemType, SearchPageType, SearchUserType } from '../../types';
 import { SearchActionTypes } from '../actions/search-action';
 
 const initState: SearchPageType = {
@@ -14,14 +14,14 @@ function searchReducer(state = initState, action: AnyAction) {
     case SearchActionTypes.setSearchItems: {
       return {
         ...state,
-        itemsSearch: [...action.items],
+        itemsSearch: Array.isArray(action.items) ? [...action.items] : [],
         usersSearch: null,
       };
     }
     case SearchActionTypes.setSearchUsers: {
       return {
         ...state,
-        usersSearch: [...action.users],
+        usersSearch: Array.isArray(action.users) ? [...action.users] : [],
         itemsSearch: null,
       };
     }
@@ -33,14 +33,16 @@ function searchReducer(state = initState, action: AnyAction) {
       };
     }
     case SearchActionTypes.setSearchList: {
-      const searchList = state.usersSearch
-        ? state.usersSearch
-        : state.itemsSearch;
+      const searchList: ItemType[] | SearchUserType[] | null = state.usersSearch
+        ? [...state.usersSearch]
+        : state.itemsSearch
+        ? [...state.itemsSearch]
+        : null;
       return {
         ...state,
         usersSearch: null,
         itemsSearch: null,
-        listSearch: searchList ? [...searchList] : null,
+        listSearch: searchList,
         isLoading: false,
       };
     }
