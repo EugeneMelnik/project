@@ -1,86 +1,124 @@
 # My App
 
-## Local development
+Веб-приложение для создания коллекций и элементов внутри них. Проект состоит
+из React-фронта, Express API, MySQL и Firebase Authentication.
 
-Requirements: Node.js, Docker and Docker Compose.
+## Требования
 
-1. Install dependencies:
+- Node.js 18 или новее
+- npm
+- Docker и Docker Compose
+- доступ к проекту Firebase для авторизации
 
-   ```bash
-   npm install
-   ```
+## Запуск локально
 
-2. Start the local MySQL container:
+Все команды выполняются из корня проекта.
 
-   ```bash
-   npm run db:up
-   ```
+### 1. Установить зависимости
 
-3. Start the API in one terminal:
+```bash
+npm install
+```
 
-   ```bash
-   npm run server:dev
-   ```
+### 2. Создать файл окружения
 
-4. Start the frontend in another terminal:
+Создайте в корне проекта файл `.env` со следующими значениями:
 
-   ```bash
-   npm start
-   ```
+```dotenv
+DATABASE_MYSQL=my_app
+USERNAME_MYSQL=my_app
+PASSWORD_MYSQL=my_app_password
+HOST_MYSQL=127.0.0.1
+PORT_MYSQL=3307
 
-The frontend is available at `http://localhost:3000`, the API at
-`http://localhost:5050`, and MySQL at `127.0.0.1:3307`.
+BASE_URL=http://localhost:3000
+REACT_APP_BASE_URL=http://localhost:5000
+API_PORT=5000
+```
 
-Firebase authentication requires the project values in `.env`. They are not
-included in the repository and cannot be generated locally.
+Переменные Firebase добавьте туда же, если они требуются серверной части:
 
-Stop the database with:
+```dotenv
+FIREBASE_APP_ID=
+FIREBASE_API_KEY=
+FIREBASE_AUTH_DOMAIN=
+FIREBASE_PROJECT_ID=
+FIREBASE_STORAGE_BUCKET=
+FIREBASE_MESSAGING_SENDER_ID=
+FIREBASE_MEASUREMENT_ID=
+```
+
+Не добавляйте `.env` в Git и не публикуйте значения Firebase.
+
+### 3. Запустить MySQL
+
+В первом терминале выполните:
+
+```bash
+npm run db:up
+```
+
+Команда запускает контейнер `my-app-db`. MySQL будет доступен на
+`127.0.0.1:3307`.
+
+### 4. Запустить API
+
+Во втором терминале выполните:
+
+```bash
+npm run server:dev
+```
+
+API и Socket.IO запустятся на `http://localhost:5000`. Сервер автоматически
+подключится к базе и синхронизирует модели Sequelize.
+
+### 5. Запустить фронтенд
+
+В третьем терминале выполните:
+
+```bash
+npm start
+```
+
+Откройте приложение в браузере: <http://localhost:3000>.
+
+Фронтенд обращается к API по адресу из `REACT_APP_BASE_URL`.
+
+## Миграции и начальные данные
+
+После запуска базы миграции можно применить командой:
+
+```bash
+npm run migrate:run
+```
+
+Для загрузки начальных данных выполните:
+
+```bash
+npm run seeders:run
+```
+
+## Остановка
+
+Остановить и удалить контейнер базы данных можно командой:
 
 ```bash
 npm run db:down
 ```
 
-## Create React App reference
+Данные MySQL сохраняются в Docker volume `mysql_data` и не удаляются при
+остановке контейнера.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Основные команды
 
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm run dev`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
+| Команда                  | Назначение                                 |
+| ------------------------ | ------------------------------------------ |
+| `npm start`              | Запуск React-фронтенда в режиме разработки |
+| `npm run server:dev`     | Запуск API с автоматическим перезапуском   |
+| `npm run server`         | Запуск API без Nodemon                     |
+| `npm run build`          | Сборка фронтенда для production            |
+| `npm test`               | Запуск тестов React                        |
+| `npm run db:up`          | Запуск MySQL                               |
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
