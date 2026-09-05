@@ -1,0 +1,22 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: my-app-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: my_app
+      MYSQL_USER: my_app
+      MYSQL_PASSWORD: my_app_password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - '3307:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h localhost -u my_app -pmy_app_password']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mysql_data:

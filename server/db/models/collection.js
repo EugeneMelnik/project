@@ -24,6 +24,11 @@ const Collection = (sequelize) => {
       type: DataTypes.ENUM('bands', 'artworks', 'books', 'memories', 'movies'),
       allowNull: false,
     },
+    isDeleted: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   });
 
   Collection.associate = function (models) {

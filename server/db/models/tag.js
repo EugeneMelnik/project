@@ -11,7 +11,6 @@ const Tag = (sequelize) => {
     content: {
       type: DataTypes.STRING,
       allowNull: false,
-      primaryKey: true,
     },
   });
 

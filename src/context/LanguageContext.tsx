@@ -6,14 +6,8 @@ import React, {
   useContext,
   useMemo,
 } from 'react';
-import { ILanguage } from '../types';
 
-export enum LanguageEnum {
-  eng = 'eng',
-  by = 'by',
-}
-
-export const languages: { [key in LanguageEnum]: ILanguage } = {
+export const languages = {
   eng: {
     mode: 'eng',
     auth: {
@@ -26,10 +20,20 @@ export const languages: { [key in LanguageEnum]: ILanguage } = {
       confirmPassword: 'Confirm password',
     },
     search: 'Search',
+    homePage: {
+      topCollections: 'Collections with the most liked items',
+      popularItems: 'Most liked items',
+    },
     userPage: {
-      createCollection: 'Create',
-      edit: 'Edit',
-      delete: 'Garbage',
+      profile: 'Profile',
+      myCollections: 'My collections',
+      collections: 'Collections',
+      items: 'Items',
+      availableActions: 'Collections to manage',
+      noCollections: 'Your collection shelf is empty',
+      createCollection: 'Create collection',
+      edit: 'Edit collections',
+      delete: 'Trash',
     },
     adminPage: {
       block: 'Block',
@@ -42,21 +46,20 @@ export const languages: { [key in LanguageEnum]: ILanguage } = {
       blocked: 'blocked',
     },
     collectionPage: {
-      createItem: 'Create',
+      createItem: 'Create item',
       edit: 'Edit',
       delete: 'Garbage',
       putDelete: 'Throw in the trash',
       putEdit: 'Make an edit',
       filterCleaning: 'Reset filter',
       export: 'Export',
-      ready: 'Ready',
-      addPhoto: 'Add photo',
       title: 'Title',
       tags: 'Tags',
       likes: 'Likes',
       actions: 'Actions',
       rowsPerPage: 'Rows per page',
       created: 'Created',
+      ready: 'Ready',
     },
     collectionsPage: {
       myCollections: 'My collections',
@@ -67,18 +70,18 @@ export const languages: { [key in LanguageEnum]: ILanguage } = {
       description: 'Description',
       nameField: 'Name field',
       nameOption: 'Name option',
-      addPhoto: 'Add photo',
       numbers: 'Fields for entering numbers',
       texts: 'Fields for entering single-line text',
       dates: 'Fields for entering dates',
       multiLines: 'Fields for entering multi-line text',
       radioFields: 'Fields with yes/no selection',
       checkboxFields: 'Fields with multiple choices',
+      addPhoto: 'Add photo',
       delete: 'Delete',
-      ready: 'Ready',
       addField: 'Add field',
       reset: 'Reset',
       confirm: 'Confirm',
+      ready: 'Ready',
     },
     modalEditCollection: {
       title: 'Title',
@@ -86,14 +89,12 @@ export const languages: { [key in LanguageEnum]: ILanguage } = {
       description: 'Description',
       variants: 'Variants',
       update: 'Update',
-      pullOut: 'Pull out',
       reset: 'Reset',
       created: 'Created',
     },
     modalEditItem: {
       title: 'Title',
       update: 'Update',
-      pullOut: 'Pull out',
       reset: 'Reset',
       enterBtn: 'Please press enter to add a new tag',
       tags: 'Tags',
@@ -101,7 +102,6 @@ export const languages: { [key in LanguageEnum]: ILanguage } = {
     },
     modalDelete: {
       delete: 'Delete',
-      pullOut: 'Pull out',
       created: 'Created',
     },
     itemPage: {
@@ -112,141 +112,150 @@ export const languages: { [key in LanguageEnum]: ILanguage } = {
       likes: 'Likes',
     },
   },
-  by: {
-    mode: 'by',
+  rus: {
+    mode: 'rus',
     auth: {
-      signUp: 'Зарэгістравацца',
-      login: 'Увайсці',
-      email: 'Электронная пошта',
+      signUp: 'Зарегистрироваться',
+      login: 'Войти',
+      email: 'Электронная почта',
       password: 'Пароль',
-      name: 'Імя',
-      surname: 'Прозвішча',
-      confirmPassword: 'Пацвердзіць пароль',
+      name: 'Имя',
+      surname: 'Фамилия',
+      confirmPassword: 'Подтвердить пароль',
     },
-    search: 'Знайсці',
+    search: 'Поиск',
+    homePage: {
+      topCollections: 'Коллекции с самыми популярными элементами',
+      popularItems: 'Самые популярные элементы',
+    },
     adminPage: {
-      block: 'Блакаваць',
-      unblock: 'Разблакаваць',
-      makeAdmin: 'Зрабіць адмінам',
-      removeAdmin: 'Выдаліць з адміна',
-      delete: 'Выдаліць',
-      active: 'актыўны',
-      blocked: 'заблакаваны',
-      admin: 'адмін',
+      block: 'Заблокировать',
+      unblock: 'Разблокировать',
+      makeAdmin: 'Назначить администратором',
+      removeAdmin: 'Убрать из администраторов',
+      delete: 'Удалить пользователя',
+      active: 'активен',
+      blocked: 'заблокирован',
+      admin: 'администратор',
     },
     userPage: {
-      createCollection: 'Стварыць',
-      edit: 'Рэдагаваць',
-      delete: 'Кошык',
+      profile: 'Профиль',
+      myCollections: 'Мои коллекции',
+      collections: 'Коллекции',
+      items: 'Элементы',
+      availableActions: 'Коллекции в работе',
+      noCollections: 'Ваша полка коллекций пока пуста',
+      createCollection: 'Создать коллекцию',
+      edit: 'Редактировать коллекции',
+      delete: 'Корзина',
     },
     collectionPage: {
-      createItem: 'Стварыць',
-      edit: 'Рэдагаваць',
-      delete: 'Кошык',
-      putDelete: 'Закінуць у кошык',
-      addPhoto: 'Add photo',
-      putEdit: 'Зрабіць выпраўленні',
-      filterCleaning: 'Ачысціць фільтр',
-      export: 'Экспарт',
-      title: 'Назва',
-      tags: 'Тэгі',
-      likes: 'Падабайкі',
-      actions: 'Дзеянні',
-      rowsPerPage: 'Радкоў на старонцы',
-      created: 'Створана',
-      ready: 'Ready',
+      createItem: 'Создать элемент',
+      edit: 'Редактировать',
+      delete: 'Корзина',
+      putDelete: 'Переместить в корзину',
+      addPhoto: 'Добавить фото',
+      putEdit: 'Редактировать',
+      filterCleaning: 'Сбросить фильтр',
+      export: 'Экспорт',
+      title: 'Название',
+      tags: 'Теги',
+      likes: 'Лайки',
+      actions: 'Действия',
+      rowsPerPage: 'Строк на странице',
+      created: 'Создано',
+      ready: 'Готово',
     },
     collectionsPage: {
-      myCollections: 'Мае калекцыі',
+      myCollections: 'Мои коллекции',
     },
     modalCreateCollection: {
-      title: 'Назва',
-      theme: 'Тэма',
-      description: 'Апісанне',
-      nameField: 'Назва поля',
-      nameOption: 'Назва выбару',
-      addPhoto: 'Дадаць фота',
-      numbers: 'Палі для ўводу лікаў',
-      texts: 'Палі для ўводу аднарадковага тэксту',
-      dates: 'Палі для ўводу даты',
-      multiLines: 'Палі для ўводу шматрадковага тэксту',
-      radioFields: 'Палі з вабарам да/не',
-      checkboxFields: 'Палі з варыянтамі выбару',
-      delete: 'Выдаліць',
-      addField: 'Дадаць поле',
-      reset: 'Сцерці',
-      confirm: 'Пацвердзіць',
-      ready: 'Гатова',
+      title: 'Название',
+      theme: 'Тема',
+      description: 'Описание',
+      nameField: 'Название поля',
+      nameOption: 'Название варианта',
+      addPhoto: 'Добавить фото',
+      numbers: 'Поля для ввода чисел',
+      texts: 'Поля для однострочного текста',
+      dates: 'Поля для ввода дат',
+      multiLines: 'Поля для многострочного текста',
+      radioFields: 'Поля с выбором да/нет',
+      checkboxFields: 'Поля с несколькими вариантами',
+      delete: 'Удалить',
+      addField: 'Добавить поле',
+      reset: 'Сбросить',
+      confirm: 'Подтвердить',
+      ready: 'Готово',
     },
     modalEditCollection: {
-      title: 'Назва',
-      theme: 'Тэма',
-      description: 'Апісанне',
-      variants: 'Варыянты',
-      update: 'Абнавіць',
-      pullOut: 'Дастаць',
-      reset: 'Сцерці',
-      created: 'Створаны',
+      title: 'Название',
+      theme: 'Тема',
+      description: 'Описание',
+      variants: 'Варианты',
+      update: 'Обновить',
+      reset: 'Сбросить',
+      created: 'Создано',
     },
     modalEditItem: {
-      title: 'Назва',
-      update: 'Абнавіць',
-      pullOut: 'Дастаць',
-      reset: 'Сцерці',
-      enterBtn: 'Для дадання новага тэга націсніце ўвод',
-      tags: 'Тэгі',
-      created: 'Створаны',
+      title: 'Название',
+      update: 'Обновить',
+      reset: 'Сбросить',
+      enterBtn: 'Нажмите Enter, чтобы добавить новый тег',
+      tags: 'Теги',
+      created: 'Создано',
     },
     modalDelete: {
-      delete: 'Выдаліць',
-      pullOut: 'Дастаць',
-      created: 'Створаны',
+      delete: 'Удалить',
+      created: 'Создано',
     },
     itemPage: {
-      created: 'Створаны',
-      comments: 'Каментары',
-      addComment: 'Дадаць каментар',
-      myComments: 'Мае каментары',
-      likes: 'Падабайкі',
+      created: 'Создано',
+      comments: 'Комментарии',
+      addComment: 'Добавить комментарий',
+      myComments: 'Мои комментарии',
+      likes: 'Лайки',
     },
   },
 };
 
-interface ILanguageContext {
-  language: ILanguage;
-  setLanguage: (language: LanguageEnum) => void;
+type LanguageType = keyof typeof languages;
+type LanguageValue = (typeof languages)[LanguageType];
+
+interface ILanguage {
+  language: LanguageValue;
+  setLanguage: (language: LanguageType) => void;
 }
 
-export function setLanguageValue(value: LanguageEnum) {
+export function setLanguageValue(value: LanguageType) {
   localStorage.setItem('language', value);
 }
 
 export function getLanguage() {
-  return localStorage.getItem('language') as LanguageEnum | null;
+  const value = localStorage.getItem('language');
+  return value === 'rus' ? value : 'eng';
 }
 
-const LanguageContext = createContext<ILanguageContext | null>(null);
+const LanguageContext = createContext<ILanguage | null>(null);
 
 export const LanguageContextProvider: FC<{ children: ReactElement }> = ({
   children,
 }) => {
-  const [language, setLanguage] = useState<ILanguage>(
-    languages[getLanguage() || 'eng']
-  );
+  const [language, setLanguage] = useState<LanguageValue>(languages[getLanguage()]);
 
-  const handleSetLanguage = (language: LanguageEnum) => {
+  const handleSetLanguage = (language: LanguageType) => {
     setLanguage(languages[language]);
 
     setLanguageValue(language);
   };
 
   if (!getLanguage()) {
-    handleSetLanguage(LanguageEnum.eng);
+    handleSetLanguage('eng');
   }
 
   const languageProviderValue = useMemo(
     () => ({ language, setLanguage: handleSetLanguage }),
-    [language]
+    [language],
   );
 
   return (
